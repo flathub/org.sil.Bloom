@@ -53,6 +53,8 @@ finish-args:
     - --filesystem=/tmp
     # libGL needs this
     - --device=dri
+    # Allow file saving.
+    - --system-talk-name=org.freedesktop.FileManager1
 rename-desktop-file: bloom.desktop
 rename-appdata-file: bloom.appdata.xml
 command: bloom
