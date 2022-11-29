@@ -43,7 +43,7 @@ index fa8c612d9..2ffe81734 100644
  	GlobalSection(SolutionProperties) = preSolution
  		HideSolutionNode = FALSE
 diff --git a/BloomDesktop/debian/bloom b/BloomDesktop/debian/bloom
-index 3e6be8764..8d2dc621e 100755
+index 3a9b81d26..22362c3bf 100755
 --- a/BloomDesktop/debian/bloom
 +++ b/BloomDesktop/debian/bloom
 @@ -1,11 +1,16 @@
@@ -66,6 +66,21 @@ index 3e6be8764..8d2dc621e 100755
 +# Without this sync, communication with BloomLibrary (or at least S3) will fail.
 +[ ! -d ~/.var/app/org.sil.Bloom/config/.mono/certs ] && /app/bin/mono /app/lib/mono/4.5/cert-sync.exe --user /app/share/ca-certificates/ca-certificates.crt
 +exec /app/bin/mono --debug "$LIB"/Bloom.exe "$@"
+diff --git a/BloomDesktop/debian/bloom.appdata.xml b/BloomDesktop/debian/bloom.appdata.xml
+index 5554992f7..2aa7df5c0 100644
+--- a/BloomDesktop/debian/bloom.appdata.xml
++++ b/BloomDesktop/debian/bloom.appdata.xml
+@@ -38,8 +38,8 @@
+   <url type="bugtracker">https://issues.bloomlibrary.org/youtrack</url>
+   <url type="help">https://community.software.sil.org/c/bloom</url>
+   <releases>
+-    <release version="5.2" date="2022-07-07">
+-    </release>
++    <release version="5.2.2" date="2022-11-29"></release>
++    <release version="5.2.1" date="2022-07-07"></release>
+   </releases>
+   <content_rating type="oars-1.0"/>
+ </component>
 diff --git a/BloomDesktop/environ b/BloomDesktop/environ
 index 44b1f73b2..1d560153b 100644
 --- a/BloomDesktop/environ
