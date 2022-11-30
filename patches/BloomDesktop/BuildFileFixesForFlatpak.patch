@@ -67,15 +67,16 @@ index 3a9b81d26..22362c3bf 100755
 +[ ! -d ~/.var/app/org.sil.Bloom/config/.mono/certs ] && /app/bin/mono /app/lib/mono/4.5/cert-sync.exe --user /app/share/ca-certificates/ca-certificates.crt
 +exec /app/bin/mono --debug "$LIB"/Bloom.exe "$@"
 diff --git a/BloomDesktop/debian/bloom.appdata.xml b/BloomDesktop/debian/bloom.appdata.xml
-index 5554992f7..2aa7df5c0 100644
+index 5554992f7..0f7d4ccdd 100644
 --- a/BloomDesktop/debian/bloom.appdata.xml
 +++ b/BloomDesktop/debian/bloom.appdata.xml
-@@ -38,8 +38,8 @@
+@@ -38,8 +38,9 @@
    <url type="bugtracker">https://issues.bloomlibrary.org/youtrack</url>
    <url type="help">https://community.software.sil.org/c/bloom</url>
    <releases>
 -    <release version="5.2" date="2022-07-07">
 -    </release>
++    <release version="5.2.3" date="2022-11-30"></release>
 +    <release version="5.2.2" date="2022-11-29"></release>
 +    <release version="5.2.1" date="2022-07-07"></release>
    </releases>
