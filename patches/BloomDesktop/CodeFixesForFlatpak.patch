@@ -128,7 +128,7 @@ index f3464543f..e1bf73a84 100644
  			s_expectedByUnitTest?.ProblemWasReported();
  
 diff --git a/BloomDesktop/src/BloomExe/Program.cs b/BloomDesktop/src/BloomExe/Program.cs
-index f9eabbc5a..660915cff 100644
+index f9eabbc5a..4b1d05397 100644
 --- a/BloomDesktop/src/BloomExe/Program.cs
 +++ b/BloomDesktop/src/BloomExe/Program.cs
 @@ -303,7 +303,7 @@ static int Main(string[] args1)
@@ -229,6 +229,15 @@ index f9eabbc5a..660915cff 100644
  		/// <summary>
  		/// Sets up different analytics channels depending on Debug or not.
  		/// Also determines whether or not Registration should occur.
+@@ -609,7 +664,7 @@ public static void RestartBloom(bool hardExit, string args = null)
+ 				{
+ 					// This is needed until the day comes (if it ever does) when we can use the
+ 					// system mono on Linux.
+-					program = "/opt/mono5-sil/bin/mono";
++					program = "/app/bin/mono";
+ 					if (args == null)
+ 						args = "\"" + Application.ExecutablePath + "\"";
+ 					else
 diff --git a/BloomDesktop/src/BloomExe/Publish/Android/BloomPubMaker.cs b/BloomDesktop/src/BloomExe/Publish/Android/BloomPubMaker.cs
 index ed9b3d39c..8e37fce37 100644
 --- a/BloomDesktop/src/BloomExe/Publish/Android/BloomPubMaker.cs
@@ -262,9 +271,18 @@ index ed9b3d39c..8e37fce37 100644
  			if (!modifiedBook.IsTemplateBook)
  				modifiedBook.RemoveBlankPages(settings?.LanguagesToInclude);
 diff --git a/BloomDesktop/src/BloomExe/Publish/BloomLibrary/BloomLibraryUploadControl.cs b/BloomDesktop/src/BloomExe/Publish/BloomLibrary/BloomLibraryUploadControl.cs
-index 89e55f729..4dc1c3804 100644
+index 89e55f729..3be004b08 100644
 --- a/BloomDesktop/src/BloomExe/Publish/BloomLibrary/BloomLibraryUploadControl.cs
 +++ b/BloomDesktop/src/BloomExe/Publish/BloomLibrary/BloomLibraryUploadControl.cs
+@@ -882,7 +882,7 @@ private void BulkUpload(string rootFolderPath)
+ 
+ 			var bloom = Application.ExecutablePath;
+ 			if (SIL.PlatformUtilities.Platform.IsLinux)
+-				bloom = $"/opt/mono5-sil/bin/mono {bloom}";
++				bloom = $"/app/bin/mono {bloom}";
+ 			var command = $"\"{bloom}\" upload \"{rootFolderPath}\" -u {_userId.Text} -d {target}";
+ 
+ 			ProcessStartInfo startInfo;
 @@ -937,11 +937,11 @@ private string GetLinuxTerminalProgramAndAdjustCommand(ref string command)
  		{
  			// See https://askubuntu.com/questions/484993/run-command-on-anothernew-terminal-window
@@ -281,6 +299,22 @@ index 89e55f729..4dc1c3804 100644
  			}
  			if (RobustFile.Exists("/usr/bin/terminator")) // popular alternative
  			{
+@@ -955,11 +955,11 @@ private string GetLinuxTerminalProgramAndAdjustCommand(ref string command)
+ 				command = $"-T \"Bloom upload\" --hold -x /bin/bash -c \"{QuoteQuotes(command)}\"";
+ 				return "/usr/bin/xfce4-terminal";
+ 			}
+-			if (RobustFile.Exists("/usr/bin/xterm"))	// antique original (slightly better than nothing)
++			if (RobustFile.Exists("/app/bin/xterm"))	// antique original (slightly better than nothing)
+ 			{
+-				// /usr/bin/xterm -hold -x /bin/bash -c "bloom upload \"folder\" -u user -d dest"
+-				command = $"-T \"Bloom upload\" -hold -e /bin/bash -c \"{QuoteQuotes(command)}\"";
+-				return "/usr/bin/xterm";
++				// /app/bin/xterm -hold -x /bin/bash -c "bloom upload \"folder\" -u user -d dest"
++				command = $"-T \"Bloom upload\" -hold -fa 'Monospace' -fs 14 -e /bin/bash -c \"{QuoteQuotes(command)}\"";
++				return "/app/bin/xterm";
+ 			}
+ 			// Neither konsole nor qterminal will launch with Bloom.  The ones above have been tested on Wasta 20.
+ 			// symbol lookup error: /usr/lib/x86_64-linux-gnu/qt5/plugins/styles/libqgtk2style.so: undefined symbol: gtk_combo_box_entry_new
 diff --git a/BloomDesktop/src/BloomExe/Publish/PDF/PdfViewer.cs b/BloomDesktop/src/BloomExe/Publish/PDF/PdfViewer.cs
 index 3df4f22f1..14fd9c17e 100644
 --- a/BloomDesktop/src/BloomExe/Publish/PDF/PdfViewer.cs
