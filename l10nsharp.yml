@@ -1,0 +1,49 @@
+name: l10nsharp
+buildsystem: simple
+build-options:
+    prepend-path: /usr/lib/sdk/mono6/bin
+    append-ld-library-path: /usr/lib/sdk/mono6/lib
+    append-pkg-config-path: /usr/lib/sdk/mono6/lib/pkgconfig
+    env:
+        DOTNET_RUNTIME_ID: org.gnome.Platform
+build-commands:
+    - |
+        set -xueo pipefail
+        pwd
+        ls -FC
+        export NUGET_PACKAGE=`pwd`/packages
+        echo NUGET_PACKAGE=$NUGET_PACKAGE
+        find . -iname nuget.exe -print
+        # we need a branch for GitVersion to work
+        git switch -c bloom5.3
+        echo mono build/nuget.exe sources add -name Downloaded -source `pwd`/nuget-sources
+        mono build/nuget.exe sources add -name Downloaded -source `pwd`/nuget-sources
+        mono build/nuget.exe sources disable -name nuget.org
+        mono build/nuget.exe sources list
+        mono build/nuget.exe restore -PackagesDirectory `pwd`/packages -force -verbosity detailed
+        msbuild /t:Build /p:Configuration=Release build/L10NSharp.proj
+        install -d /app/l10nsharp
+        install output/Release/net461/L10NSharp.dll /app/l10nsharp
+        install output/Release/net461/L10NSharp.pdb /app/l10nsharp
+sources:
+    - type: git
+      url: https://github.com/sillsdev/l10nsharp.git
+      commit: 011deabb2d68e36dbf6eded9a0f51d08ba31e0d7
+    - type: file
+      url: https://dist.nuget.org/win-x86-commandline/v6.2.1/nuget.exe
+      sha256: a79f342e739fdb3903a92218767e7813e04930dff463621b6d2be2d468b84e05
+      dest: build/
+    - type: patch
+      path: patches/l10nsharp/l10n-fixes.patch
+    # To regenerate these nuget.json files:
+    #   .../flatpak-builder-tools/dotnet/flatpak-dotnet-generator.py AddSortKey-nuget.json AddSortKey/AddSortKey.csproj
+    #   etc, etc, etc
+    # Note that the specific list may vary as projects get added or removed from l10nsharp.
+    - l10nsharp/CheckOrFixXliff-nuget.json
+    - l10nsharp/ExtractXliff-nuget.json
+    - l10nsharp/L10NSharp-nuget.json
+    - l10nsharp/L10NSharpTests-nuget.json
+    - l10nsharp/SampleApp-nuget.json
+    # To regenerate bloom-build-sources-nuget.yml:
+    #   ./compose-nuget-sources l10nsharp/l10nsharp-build-sources-nuget.yml nuget-sources ./extra/l10nsharpBuild.config
+    - l10nsharp/l10nsharp-build-sources-nuget.yml

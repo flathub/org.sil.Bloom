@@ -26,12 +26,8 @@ build-commands:
         export NUGET_PACKAGE=`pwd`/packages
         echo NUGET_PACKAGE=$NUGET_PACKAGE
         find . -iname nuget.exe -print
-        # flathub is complaining about a hook failing: we don't have any hooks!
-        # But cleaning out the hooks folder shouldn't hurt.
-        ls -FC .git/hooks
-        rm -fv .git/hooks/*
         # we need a branch for GitVersion to work
-        git switch -c bloom5.2
+        git switch -c bloom5.3
         echo mono build/nuget.exe sources add -name Downloaded -source `pwd`/nuget-sources
         mono build/nuget.exe sources add -name Downloaded -source `pwd`/nuget-sources
         mono build/nuget.exe sources disable -name nuget.org
@@ -59,7 +55,7 @@ build-commands:
 sources:
     - type: git
       url: https://github.com/sillsdev/libpalaso.git
-      commit: c4fd324c4024640ba6652e5184d66bf7962672d2
+      commit: 682fcb0943f56f7ab80564e734ef3411a571a433
       disable-shallow-clone: true
     - type: file
       url: https://dist.nuget.org/win-x86-commandline/v6.2.1/nuget.exe
@@ -68,7 +64,9 @@ sources:
     # To regenerate these nuget.json files:
     #   .../flatpak-builder-tools/dotnet/flatpak-dotnet-generator.py AddSortKey-nuget.json AddSortKey/AddSortKey.csproj
     #   etc, etc, etc
+    # Note that the specific list may vary as projects get added or removed from libpalaso.
     - palaso/AddSortKey-nuget.json
+    - palaso/ClipboardTestApp-nuget.json
     - palaso/ExtractCopyright-nuget.json
     - palaso/ExtractCopyright.Tests-nuget.json
     - palaso/FastSplitterTest-nuget.json
@@ -109,7 +107,6 @@ sources:
     - palaso/SIL.Windows.Forms.WritingSystems.Tests-nuget.json
     - palaso/SIL.WritingSystems-nuget.json
     - palaso/SIL.WritingSystems.Tests-nuget.json
-    - palaso/TestApps-nuget.json
     - palaso/TestAppKeyboard-nuget.json
     - type: patch
       path: patches/libpalaso/RestrictLibpalasoToNet461.patch

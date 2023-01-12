@@ -1,0 +1,65 @@
+[
+    {
+        "type": "file",
+        "url": "https://api.nuget.org/v3-flatcontainer/gitversion.msbuild/5.8.1/gitversion.msbuild.5.8.1.nupkg",
+        "sha512": "736d08bdccdfda3f9dd211a263d09145b57f22ea1fd77c92ad7a577b508305b14c7e14306f72ad75a11c8386c6e9e934c958b73801f73571bb54dfbc5c70b39d",
+        "dest": "nuget-sources",
+        "dest-filename": "gitversion.msbuild.5.8.1.nupkg"
+    },
+    {
+        "type": "file",
+        "url": "https://api.nuget.org/v3-flatcontainer/microsoft.build.tasks.git/1.0.0/microsoft.build.tasks.git.1.0.0.nupkg",
+        "sha512": "f33713b42dbbda0cf31c671ed8aa603201270f81ffdfbe4942d5bae5b47323212c74ab1cd5875f24b8240f02274bbc167c9b0e95b9851b5091025b9a0d42f9e6",
+        "dest": "nuget-sources",
+        "dest-filename": "microsoft.build.tasks.git.1.0.0.nupkg"
+    },
+    {
+        "type": "file",
+        "url": "https://api.nuget.org/v3-flatcontainer/microsoft.netframework.referenceassemblies/1.0.2/microsoft.netframework.referenceassemblies.1.0.2.nupkg",
+        "sha512": "8bf3922b695856059b8eec696a7ace03a7269d71d4c456cbdfb21bd3f6e69f2a9fa25e46acd5c29ad872829a07cc05ec083c3a6ee942bca21afd47ce3bc533e3",
+        "dest": "nuget-sources",
+        "dest-filename": "microsoft.netframework.referenceassemblies.1.0.2.nupkg"
+    },
+    {
+        "type": "file",
+        "url": "https://api.nuget.org/v3-flatcontainer/microsoft.netframework.referenceassemblies.net461/1.0.2/microsoft.netframework.referenceassemblies.net461.1.0.2.nupkg",
+        "sha512": "8f76c8197b5b6cf6dfb079073eed7bab46fe1cb8c63d66112850ae2d6fee650abdb142e61d2ffac1a6752d9dd1a07aa5105b27b61805b1076447099dceaeb3dd",
+        "dest": "nuget-sources",
+        "dest-filename": "microsoft.netframework.referenceassemblies.net461.1.0.2.nupkg"
+    },
+    {
+        "type": "file",
+        "url": "https://api.nuget.org/v3-flatcontainer/microsoft.sourcelink.common/1.0.0/microsoft.sourcelink.common.1.0.0.nupkg",
+        "sha512": "aa73a2aa20711ec2b294b56776bdaea874b1f5c7792f55c150f8eeff8e474ed1afd0f8f9388bb9d88ddacda8dd35e9e5e110cdeb5296594d68d03badad157d85",
+        "dest": "nuget-sources",
+        "dest-filename": "microsoft.sourcelink.common.1.0.0.nupkg"
+    },
+    {
+        "type": "file",
+        "url": "https://api.nuget.org/v3-flatcontainer/microsoft.sourcelink.github/1.0.0/microsoft.sourcelink.github.1.0.0.nupkg",
+        "sha512": "215368bb85b95201820fdc8e7b5b12220fe7207fbb12842f7fc19a97edf707cc96d84254a309ed8131a702f5dbd50c205d3183bf9c503a35fba2e799c58561b4",
+        "dest": "nuget-sources",
+        "dest-filename": "microsoft.sourcelink.github.1.0.0.nupkg"
+    },
+    {
+        "type": "file",
+        "url": "https://api.nuget.org/v3-flatcontainer/nunit/2.6.4/nunit.2.6.4.nupkg",
+        "sha512": "e0510c05364d512d810d8bc5741462cb8eeef06b45101f81106f5489fd9f9987d07050320d4306c41c9bc76fe186735a8e3544be0b496dc416617cf0bdb99600",
+        "dest": "nuget-sources",
+        "dest-filename": "nunit.2.6.4.nupkg"
+    },
+    {
+        "type": "file",
+        "url": "https://api.nuget.org/v3-flatcontainer/nunit.runners.net4/2.6.4/nunit.runners.net4.2.6.4.nupkg",
+        "sha512": "3c716df0a015e33568f25ade1993940d72cafb8ebee204f3a0b89005c3aa2abb8a57a7f183cdd4fc8bde375b8d4b9dd32e36e5c71e03c6e595f2fd04194c0613",
+        "dest": "nuget-sources",
+        "dest-filename": "nunit.runners.net4.2.6.4.nupkg"
+    },
+    {
+        "type": "file",
+        "url": "https://api.nuget.org/v3-flatcontainer/sil.releasetasks/2.5.0/sil.releasetasks.2.5.0.nupkg",
+        "sha512": "461acfe39cc268d38b798a5c95ce3df55fcda37c33eddcf85f98225dd865025defab88dd3db6ab9a7677f572dce616ab7e76c197a41e36445c9d3a1d8d7fc59d",
+        "dest": "nuget-sources",
+        "dest-filename": "sil.releasetasks.2.5.0.nupkg"
+    }
+]

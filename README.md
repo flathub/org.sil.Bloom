@@ -54,6 +54,9 @@ exec &> >(tee "${LOG_DIR}/flatpak-build-$(date +"%F-%H%M%S").log")
 # place for optional inspection.
 #rm -rf .flatpak-builder/build
 mkdir -p ../flatpak/local-repo
+# The mono5-sil build has submodules that need the following setting, which is picked
+# up from the user's $HOME/.gitconfig file.
+git config --global protocol.file.allow always
 flatpak-builder --user --repo=../flatpak/local-repo --keep-build-dirs --force-clean ./build-dir org.sil.Bloom.yml "$@"
 flatpak --user remote-add --no-gpg-verify --if-not-exists local-repo ../flatpak/local-repo
 # If a Bloom flatpak is already installed, such as from a downloaded

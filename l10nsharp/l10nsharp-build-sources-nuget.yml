@@ -1,0 +1,11 @@
+# Generated file
+- type: file
+  url: https://api.nuget.org/v3-flatcontainer/nunit.runners.net4/2.6.4/nunit.runners.net4.2.6.4.nupkg
+  dest-filename: nunit.runners.net4.2.6.4.nupkg
+  sha512: 3c716df0a015e33568f25ade1993940d72cafb8ebee204f3a0b89005c3aa2abb8a57a7f183cdd4fc8bde375b8d4b9dd32e36e5c71e03c6e595f2fd04194c0613
+  dest: nuget-sources
+- type: file
+  url: https://api.nuget.org/v3-flatcontainer/sil.buildtasks/2.2.0/sil.buildtasks.2.2.0.nupkg
+  dest-filename: sil.buildtasks.2.2.0.nupkg
+  sha512: 81ee20dba08f531cf08525987f368df827273ad8bccb230453e08b71e3517b2411636d49d776ca1c0bed6bc68839245a32af5587a362281c2841af7a3c372a58
+  dest: nuget-sources
