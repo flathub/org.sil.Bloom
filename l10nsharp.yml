@@ -14,6 +14,9 @@ build-commands:
         export NUGET_PACKAGE=`pwd`/packages
         echo NUGET_PACKAGE=$NUGET_PACKAGE
         find . -iname nuget.exe -print
+        # flathub is complaining about a hook failing: there aren't any hooks
+        # that are needed just to build l10nsharp.
+        rm -fv .git/hooks/*
         # we need a branch for GitVersion to work
         git switch -c bloom5.3
         echo mono build/nuget.exe sources add -name Downloaded -source `pwd`/nuget-sources
