@@ -1,0 +1,13 @@
+diff --git a/configure.ac b/configure.ac
+index b7a30e9..472b1b0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -36,7 +36,7 @@ AM_GNU_GETTEXT
+ 
+ # Forte Compiler ############################################################
+ FORTE_LDFLAGS=""
+-FORTE_CCFLAGS="-Wall"
++FORTE_CCFLAGS="-Wall -fcommon"
+ if test x$enable_forte = xyes; then
+ 	FORTE_LDFLAGS="-lX11"
+ 	FORTE_CCFLAGS=""

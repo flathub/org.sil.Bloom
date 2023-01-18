@@ -1,6 +1,6 @@
 # Bloom Flatpak package build specification
 #
-# Copyright (c) 2022 SIL International. MIT License.
+# Copyright (c) 2023 SIL International. MIT License.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,19 +23,13 @@
 app-id: org.sil.Bloom
 
 runtime: org.gnome.Platform
+# This appears to be the last runtime version that Bloom will run on.
 runtime-version: "42"
 sdk: org.gnome.Sdk
 sdk-extensions:
     - org.freedesktop.Sdk.Extension.node16
     - org.freedesktop.Sdk.Extension.mono6
 writable-sdk: true # Required to install msbuild for building libpalaso and geckofx
-
-# maybe someday, build a custom ffmpeg with just what we want
-add-extensions:
-  org.freedesktop.Platform.ffmpeg-full:
-    directory: lib/ffmpeg
-    version: '21.08'
-    add-ld-path: .
 
 finish-args:
     - --socket=x11
@@ -51,9 +45,9 @@ finish-args:
     # show the user, such as creating PDFs, ePUBs, or BloomPub ebooks.  Use the
     # same /tmp as the host, so the host programs can find the files.
     - --filesystem=/tmp
-    # libGL needs this
-    - --device=dri
-    # Allow file saving.
+    # webcam apparently needs this
+    - --device=all
+    # enable file saving
     - --system-talk-name=org.freedesktop.FileManager1
 rename-desktop-file: bloom.desktop
 rename-appdata-file: bloom.appdata.xml
@@ -67,7 +61,8 @@ modules:
           env:
               MONO_PREFIX: "/app"
               MONO_SILPKGDIR: "/app"
-              NUGET_DEST: "BloomDesktop/packages"
+              NUGET_SRC: "nuget_packages"
+              NUGET_DEST: "packages"
               INSTALLATION_PREFIX: "/app"
               RUNMODE: "PACKAGING"
               XDG_CACHE_HOME: /run/build/flatpak-node/cache
@@ -80,100 +75,28 @@ modules:
           - |
               set -xueo pipefail
               yarn config set yarn-offline-mirror ${FLATPAK_BUILDER_BUILDDIR}/flatpak-node/yarn-mirror
-              cd BloomDesktop
-              # These steps are adapted from the debian/rules file
+              cp local-extra/Makefile .
               export NODE_OPTIONS=--max-old-space-size=1536
-              if [ -f ../local-extra/build_number.env ]; then . ../local-extra/build_number.env; else FULL_BUILD_NUMBER=5.2.1.0; fi
-              (cd src/BloomBrowserUI && yarn --offline --ignore-engines && yarn --offline --ignore-engines build)
-              msbuild /t:SetAssemblyVersion /p:RootDir=`pwd` /p:BUILD_NUMBER=${FULL_BUILD_NUMBER} build/Bloom.proj
-              msbuild /p:Configuration=Release /p:BUILD_NUMBER=${FULL_BUILD_NUMBER} /v:diag "Bloom.sln"
-              msbuild /p:Configuration=Release /p:BUILD_NUMBER=${FULL_BUILD_NUMBER} src/LinuxBloomLauncher/LinuxBloomLauncher.cproj
-              ##################################################################
-              # mimic the installation steps used by the debian packaging
-              # Install library files
-              install -d ${BLOOMLIB}
-              cp -rv output/Release/* ${BLOOMLIB}
-              find ${BLOOMLIB} -type f -print0 | xargs -0 chmod 644
-              chmod +x ${BLOOMLIB}/BloomLauncher
-              chmod +x ${BLOOMLIB}/*.sh
-              chmod +x ${BLOOMLIB}/*.exe
-              chmod +x ${BLOOMLIB}/*.dll
-              chmod +x ${BLOOMLIB}/Firefox/*.so*
-              find ${BLOOMLIB} -type d -print0 | xargs -0 chmod 755
-              install -d ${BLOOMSHARE}
-              install -m 644 environ* ${BLOOMSHARE}
-              # Install data files
-              cp -r DistFiles/* ${BLOOMLIB}
-              chmod -R a+rX,og-w ${BLOOMLIB}
-              # Install browser support files
-              cp -r output/browser ${BLOOMLIB}
-              chmod -R a+rX,og-w ${BLOOMLIB}/browser
-              # Install wrapper script
-              install -d ${INSTALLATION_PREFIX}/bin
-              install debian/bloom ${INSTALLATION_PREFIX}/bin
-              # Add to Applications menu
-              install -d ${INSTALLATION_PREFIX}/share/pixmaps
-              install -d ${INSTALLATION_PREFIX}/share/icons/hicolor/48x48/mimetypes/
-              install -d ${INSTALLATION_PREFIX}/share/icons/hicolor/scalable/mimetypes/
-              install -m 644 debian/bloom.png ${INSTALLATION_PREFIX}/share/pixmaps/org.sil.Bloom.png
-              install -m 644 debian/bloom.svg ${INSTALLATION_PREFIX}/share/pixmaps/org.sil.Bloom.svg
-              install -m 644 debian/bloom.png ${INSTALLATION_PREFIX}/share/icons/hicolor/48x48/mimetypes/org.sil.Bloom.png
-              install -m 644 debian/bloom.svg ${INSTALLATION_PREFIX}/share/icons/hicolor/scalable/mimetypes/org.sil.Bloom.svg
-              install -d ${INSTALLATION_PREFIX}/share/applications
-              desktop-file-install --dir ${INSTALLATION_PREFIX}/share/applications --set-icon=org.sil.Bloom debian/bloom.desktop
-              # Install icon for our mime type so that it shows up as icon for a bloompack
-              install -m 644 debian/BloomPack.png ${INSTALLATION_PREFIX}/share/icons/hicolor/48x48/mimetypes/application-bloom.png
-              install -m 644 debian/BloomPack.svg ${INSTALLATION_PREFIX}/share/icons/hicolor/scalable/mimetypes/application-bloom.svg
-              # Add bloom-collection mime type
-              install -m 644 debian/bloom-collection.png ${INSTALLATION_PREFIX}/share/icons/hicolor/48x48/mimetypes/application-bloom-collection.png
-              install -m 644 debian/bloom-collection.svg ${INSTALLATION_PREFIX}/share/icons/hicolor/scalable/mimetypes/application-bloom-collection.svg
-              # Add bloom-join-team mime type
-              install -m 644 debian/JoinBloomTC.png ${INSTALLATION_PREFIX}/share/icons/hicolor/48x48/mimetypes/application-bloom-join-team.png
-              install -m 644 debian/JoinBloomTC.svg ${INSTALLATION_PREFIX}/share/icons/hicolor/scalable/mimetypes/application-bloom-join-team.svg
-              # Add AppStream metadata file
-              install -d ${INSTALLATION_PREFIX}/share/appdata
-              install -m 644 debian/bloom.appdata.xml ${INSTALLATION_PREFIX}/share/appdata
-              # Remove unwanted files
-              cd ${BLOOMLIB} && rm -rf AxInterop* BloomTests* Interop* Moq* nunit* NUnit* AndikaNewBasic ffmpeg ghostscript
-              find ${BLOOMLIB} -name '*.map' -print0 | xargs -0 rm -f
-              find ${BLOOMLIB} -name '*Spec.js' -print0 | xargs -0 rm -f
-              find ${BLOOMLIB} -name 'CheckOrFixXliff.*' -print0 | xargs -0 rm -f
-              find ${BLOOMLIB} -name 'GeckofxHtmlToPdf.*' -print0 | xargs -0 rm -f
-              find ${BLOOMLIB} -name '*UnitTestFramework.dll' -type d -print0 | xargs -0 rm -rf
-              find ${BLOOMLIB} -name 'Moq.*' -print0 | xargs -0 rm -f
-              # We need NAudio.dll for SIL.Media to load even though it's Windows-only.  But we don't need the xml file.
-              find ${BLOOMLIB} -name 'NAudio.xml' -print0 | xargs -0 rm -f
-              find ${BLOOMLIB} -name 'irrKlang.NET4.dll' -print0 | xargs -0 rm -f
-              find ${BLOOMLIB} -name 'win-x86' -type d -print0 | xargs -0 rm -rf
-              find ${BLOOMLIB} -name 'win-x64' -type d -print0 | xargs -0 rm -rf
-              find ${BLOOMLIB} -name '*Interop.AcroPDFLib.*' -print0 | xargs -0 rm -f
-              # These are needed to compile libpalaso on Windows, but aren't really used even there I suspect.
-              find ${BLOOMLIB} -name 'AtkSharp.dll' -print0 | xargs -0 rm -f
-              find ${BLOOMLIB} -name 'CairoSharp.dll' -print0 | xargs -0 rm -f
-              find ${BLOOMLIB} -name 'GdkSharp.dll' -print0 | xargs -0 rm -f
-              find ${BLOOMLIB} -name 'GioSharp.dll' -print0 | xargs -0 rm -f
-              find ${BLOOMLIB} -name 'GLibSharp.dll' -print0 | xargs -0 rm -f
-              find ${BLOOMLIB} -name 'GtkSharp.dll' -print0 | xargs -0 rm -f
-              find ${BLOOMLIB} -name 'PangoSharp.dll' -print0 | xargs -0 rm -f
-              # make up for deficient mono mapping
-              ln -s /usr/lib/x86_64-linux-gnu/libdl.so.2 ${INSTALLATION_PREFIX}/lib/libdl.so
-              # make room for the ffmpeg-full extension
-              install -d ${INSTALLATION_PREFIX}/lib/ffmpeg
+              if [ -f local-extra/build_number.env ]; then . local-extra/build_number.env; else export FULL_BUILD_NUMBER=5.3.1.0; fi
+              make -B build
+              make -B install
+
       cleanup:
           - "/include"
           - "/lib/*/include"
           - "*.a"
       sources:
           - type: git
-            dest: BloomDesktop
             url: https://github.com/BloomBooks/BloomDesktop.git
-            commit: 06bd25f037bafad0cef3e74081801a72ca982d97
+            commit: 3bad77c612e5bbbf8befefe403487b0df74f7f67
           # Bloom nuget dependencies
           # To regenerate bloom-build-sources-nuget.yml:
-          #   ./compose-nuget-sources bloom-build-sources-nuget.yml . ./buildPackages.config
+          #   ./compose-nuget-sources bloom-build-sources-nuget.yml nuget_packages ./extra/buildPackages.config
           - bloom-build-nuget-sources.yml
           # To regenerate bloom-sources-nuget.yml:
-          #   ./compose-nuget-sources bloom-sources-nuget.yml . ../src/BloomExe/Linux/packages.config
+          #   ./compose-nuget-sources bloom-sources-nuget.yml nuget_packages ../BloomDesktop/src/BloomExe/Linux/packages.config
+          # (but first, you have to apply a patch to get the right version on MarkdownDeep
+          # and to pick up two System.* files from BloomTests.)
           - bloom-sources-nuget.yml
           - type: shell
             # Extract nuget packages. The 'type: archive', 'archive-type: zip' had
@@ -181,7 +104,7 @@ modules:
             commands:
                 - |
                     set -xueo pipefail
-                    for package in *.nupkg; do
+                    for package in ${NUGET_SRC}/*.nupkg; do
                       mkdir -p "${NUGET_DEST}/$(basename "${package}" .nupkg)" &&
                         unzip "${package}" \
                           -d "${NUGET_DEST}/$(basename "${package}" .nupkg)"
@@ -192,22 +115,22 @@ modules:
                     chmod 755 "${NUGET_DEST}"/sqlite-net-pcl.1.7.335/lib/netstandard2.0/SQLite-net.*
                     # copy artifacts from internal libpalaso and geckofx builds to where the nuget packages have been installed.
                     # (we need some things the nuget package includes, but want to replace the actual assemblies and add debug info)
-                    cp --verbose --force /app/libpalaso/SIL.Core.dll "${NUGET_DEST}"/SIL.Core.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Core.pdb "${NUGET_DEST}"/SIL.Core.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Core.Desktop.dll "${NUGET_DEST}"/SIL.Core.Desktop.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Core.Desktop.pdb "${NUGET_DEST}"/SIL.Core.Desktop.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Media.dll "${NUGET_DEST}"/SIL.Media.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Media.pdb "${NUGET_DEST}"/SIL.Media.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.dll "${NUGET_DEST}"/SIL.Windows.Forms.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.pdb "${NUGET_DEST}"/SIL.Windows.Forms.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.GeckoBrowserAdapter.dll "${NUGET_DEST}"/SIL.Windows.Forms.GeckoBrowserAdapter.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.GeckoBrowserAdapter.pdb "${NUGET_DEST}"/SIL.Windows.Forms.GeckoBrowserAdapter.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.Keyboarding.dll "${NUGET_DEST}"/SIL.Windows.Forms.Keyboarding.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.Keyboarding.pdb "${NUGET_DEST}"/SIL.Windows.Forms.Keyboarding.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.WritingSystems.dll "${NUGET_DEST}"/SIL.Windows.Forms.WritingSystems.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.WritingSystems.pdb "${NUGET_DEST}"/SIL.Windows.Forms.WritingSystems.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.WritingSystems.dll "${NUGET_DEST}"/SIL.WritingSystems.9.0.0-beta0119/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.WritingSystems.pdb "${NUGET_DEST}"/SIL.WritingSystems.9.0.0-beta0119/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Core.dll "${NUGET_DEST}"/SIL.Core.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Core.pdb "${NUGET_DEST}"/SIL.Core.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Core.Desktop.dll "${NUGET_DEST}"/SIL.Core.Desktop.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Core.Desktop.pdb "${NUGET_DEST}"/SIL.Core.Desktop.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Media.dll "${NUGET_DEST}"/SIL.Media.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Media.pdb "${NUGET_DEST}"/SIL.Media.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.dll "${NUGET_DEST}"/SIL.Windows.Forms.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.pdb "${NUGET_DEST}"/SIL.Windows.Forms.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.GeckoBrowserAdapter.dll "${NUGET_DEST}"/SIL.Windows.Forms.GeckoBrowserAdapter.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.GeckoBrowserAdapter.pdb "${NUGET_DEST}"/SIL.Windows.Forms.GeckoBrowserAdapter.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.Keyboarding.dll "${NUGET_DEST}"/SIL.Windows.Forms.Keyboarding.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.Keyboarding.pdb "${NUGET_DEST}"/SIL.Windows.Forms.Keyboarding.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.WritingSystems.dll "${NUGET_DEST}"/SIL.Windows.Forms.WritingSystems.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.WritingSystems.pdb "${NUGET_DEST}"/SIL.Windows.Forms.WritingSystems.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.WritingSystems.dll "${NUGET_DEST}"/SIL.WritingSystems.9.0.1-beta0015/lib/net461/
+                    cp --verbose --force /app/libpalaso/SIL.WritingSystems.pdb "${NUGET_DEST}"/SIL.WritingSystems.9.0.1-beta0015/lib/net461/
                     rm "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/Geckofx-*.dll.mdb
                     cp --verbose --force /app/geckofx/Geckofx-Core.dll "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
                     cp --verbose --force /app/geckofx/Geckofx-Core.dll.config "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
@@ -215,7 +138,11 @@ modules:
                     cp --verbose --force /app/geckofx/Geckofx-Winforms.dll "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
                     cp --verbose --force /app/geckofx/Geckofx-Winforms.dll.config "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
                     cp --verbose --force /app/geckofx/Geckofx-Winforms.pdb "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
-                    rm -rf /app/libpalaso /app/geckofx
+                    cp --verbose --force /app/l10nsharp/L10NSharp.dll "${NUGET_DEST}"/L10NSharp.5.0.0-beta0088/lib/net461/
+                    cp --verbose --force /app/l10nsharp/L10NSharp.pdb "${NUGET_DEST}"/L10NSharp.5.0.0-beta0088/lib/net461/
+                    rm -rf /app/libpalaso /app/geckofx /app/l10nsharp
+
+
           # Bloom dependencies
           # Find updates via Bloom.git with a command like:
           #   git log -p -- build/getDependencies-Linux.sh
@@ -229,9 +156,13 @@ modules:
                 - |
                     set -xueo pipefail
                     pwd
-                    mkdir -p "BloomDesktop/DistFiles/pdf" && unzip -uqo BloomDesktop/Downloads/pdfjs-viewer.zip -d "BloomDesktop/DistFiles/pdf"
+                    mkdir -p "DistFiles/pdf" && unzip -uqo Downloads/pdfjs-viewer.zip -d "DistFiles/pdf"
           # python3 flatpak-builder-tools/node/flatpak-node-generator.py -o bloom-sources-browser-node.json yarn ../src/BloomBrowserUI/yarn.lock
+          # (or flatpak-node-generator -o bloom-sources-browser-node.json yarn ../BloomDesktop/src/BloomBrowserUI/yarn.lock)
           - bloom-sources-browser-node.json
+          # python3 flatpak-builder-tools/node/flatpak-node-generator.py -o bloom-sources-content-node.json yarn ../src/content/yarn.lock
+          # (or flatpak-node-generator -o bloom-sources-content-node.json yarn /d/github/BloomDesktop/src/content/yarn.lock)
+          - bloom-sources-content-node.json
           - type: patch
             path: patches/BloomDesktop/BuildFileFixesForFlatpak.patch
           - type: patch
@@ -239,6 +170,10 @@ modules:
           - type: dir
             path: ./extra
             dest: local-extra
+          - type: file
+            url: https://dist.nuget.org/win-x86-commandline/v6.2.1/nuget.exe
+            sha256: a79f342e739fdb3903a92218767e7813e04930dff463621b6d2be2d468b84e05
+            dest: .nuget
       modules:
           # python2.7 is needed for mono5-sil
           - shared-modules/python2.7/python-2.7.json
@@ -511,8 +446,8 @@ modules:
           - name: ca-certificates
             sources:
                 - type: file
-                  url: http://us.archive.ubuntu.com/ubuntu/pool/main/c/ca-certificates/ca-certificates_20211016~20.04.1_all.deb
-                  sha256: 5a7b922d35e328d7d7765a353f1bbc9e14c8476e67606b605c6d0b1186037571
+                  url: http://us.archive.ubuntu.com/ubuntu/pool/main/c/ca-certificates/ca-certificates_20211016ubuntu0.20.04.1_all.deb
+                  sha256: 28794ff2b3d9a837857879664d5d23cad829ad2894251194b1e78b3b1860b389
             buildsystem: simple
             build-commands:
                 - |
@@ -544,6 +479,139 @@ modules:
                   commit: a77e5ba72728630ee02b95892d5fd0c219f87c98
                 - type: patch
                   path: patches/geckofx/FixesForFlatpak.patch
+          - l10nsharp.yml
+          # Andika Fonts
+          # Extract fonts. The 'type: archive', 'archive-type: zip' has some trouble working,
+          # so manually extract.
+          - name: AndikaFonts
+            sources:
+                - type: file
+                  url: https://software.sil.org/downloads/r/andika/Andika-6.101.zip
+                  sha256: 8595a879054a540b24fa942a2621efcd194a9f6468d9cf2541ae693e496b8dd4
+                - type: file
+                  url: https://software.sil.org/downloads/r/andika/AndikaNewBasic-5.500.zip
+                  sha256: 18308284a3e98cd7712d057742d8d6cd040a52ec0479a1dcf92d57815f8d368a
+            buildsystem: simple
+            build-commands:
+                - |
+                    set -xueo pipefail
+                    unzip -uqo Andika-6.101.zip
+                    install -d /app/share/fonts/truetype/andika
+                    install Andika-6.101/Andika-Regular.ttf /app/share/fonts/truetype/andika
+                    install Andika-6.101/Andika-Bold.ttf /app/share/fonts/truetype/andika
+                    install Andika-6.101/Andika-Italic.ttf /app/share/fonts/truetype/andika
+                    install Andika-6.101/Andika-BoldItalic.ttf /app/share/fonts/truetype/andika
+                    install -d /app/share/doc/fonts-sil-andika
+                    install Andika-6.101/OFL.txt /app/share/doc/fonts-sil-andika
+                    install Andika-6.101/README.txt /app/share/doc/fonts-sil-andika
+                    unzip -uqo AndikaNewBasic-5.500.zip
+                    install -d /app/share/fonts/opentype/andika-new-basic
+                    install AndikaNewBasic-5.500/AndikaNewBasic-R.ttf /app/share/fonts/opentype/andika-new-basic
+                    install AndikaNewBasic-5.500/AndikaNewBasic-B.ttf /app/share/fonts/opentype/andika-new-basic
+                    install AndikaNewBasic-5.500/AndikaNewBasic-I.ttf /app/share/fonts/opentype/andika-new-basic
+                    install AndikaNewBasic-5.500/AndikaNewBasic-BI.ttf /app/share/fonts/opentype/andika-new-basic
+                    install -d /app/share/doc/fonts-sil-andika-new-basic
+                    install AndikaNewBasic-5.500/OFL.txt /app/share/doc/fonts-sil-andika-new-basic
+                    install AndikaNewBasic-5.500/README.txt /app/share/doc/fonts-sil-andika-new-basic
+          # for gtklp
+          - shared-modules/gtk2/gtk2.json
+          - name: gtklp
+            sources:
+              - type: archive
+                url: https://downloads.sourceforge.net/project/gtklp/gtklp/1.3.4/gtklp-1.3.4.src.tar.gz
+                sha256: be07609042595fa932034e3b2d7038cef33901ec0863fcedbb5188acb6b53bab
+              - type: patch
+                path: patches/gtklp/FixGtklpForNewGcc.patch
+          # for xterm (used by bulk upload)
+          - name: xterm
+            sources:
+              - type: git
+                url: https://github.com/ThomasDickey/xterm-snapshots.git
+                tag: xterm-364
+                commit: 6b07755324d62a64cfcf11ef750670c2ede583ca
+                x-checker-data:
+                  type: anitya
+                  project-id: 5272
+                  tag-template: xterm-$version
+                  is-main-source: true
+            modules:
+              - name: libXaw
+                sources: &libXaw-sources
+                  - type: archive
+                    url: https://xorg.freedesktop.org/releases/individual/lib/libXaw-1.0.12.tar.bz2
+                    sha256: 96fc314874fce9979556321d1d6ee00b5baf32fb333b7278853b4983bc3cdbf6
+                    x-checker-data:
+                      type: anitya
+                      project-id: 1766
+                      url-template: https://xorg.freedesktop.org/releases/individual/lib/libXaw-$version.tar.bz2
+              - name: libXaw-32bit
+                sources: *libXaw-sources
+              - name: ncurses
+                sources:
+                  - type: archive
+                    url: https://invisible-mirror.net/archives/ncurses/current/ncurses-6.3-20220827.tgz
+                    sha256: "e9daea489c50be3c325db8d49891e412a75c64aa0cfb3252d0b3d8f02529b748"
+          # for ffmpeg
+          - name: libx264
+            config-opts:
+              - --enable-shared
+              - --disable-cli
+              - --enable-static
+              - --disable-cli
+              - --disable-gpl
+              - --disable-opencl
+              - --disable-avs
+              - --disable-swscale
+              - --disable-lavf
+              - --disable-ffms
+              - --disable-gpac
+              - --disable-lsmash
+              - --enable-lto
+            sources:
+              - type: git
+                url: https://code.videolan.org/videolan/x264.git
+                commit: baee400fa9ced6f5481a728138fed6e867b0ff7f
+          - name: ffmpeg
+            config-opts:
+              - --disable-postproc
+              - --enable-avcodec
+              - --enable-avdevice
+              - --enable-avformat
+              - --enable-avfilter
+              - --enable-swresample
+              - --enable-swscale
+              - --disable-encoders
+              - --enable-encoder=rawvideo,libx264,libvpx_vp8,aac,libmp3lame,h263,pcm_s16be,pcm_s24be,pcm_s16le,pcm_s24le,pcm_s32le,pcm_u8,null
+              - --disable-hwaccels
+              - --disable-parsers
+              - --enable-parser=h264,vp8,mpegaudio
+              - --disable-protocols
+              - --enable-protocol=file,concat
+              - --disable-muxers
+              - --enable-muxer=rawvideo,mp4,mp3,tgp,pcm_s16be,pcm_s16le,wav,null
+              - --disable-bsfs
+              - --disable-filters
+              - --enable-filter=scale,adelay,afade,amix,aresample,volume
+              - --disable-indevs
+              - --enable-indev=gdigrab
+              - --disable-outdevs
+              - --disable-autodetect
+              - --enable-libx264
+              - --enable-libvorbis
+              - --enable-libvpx
+              - --enable-libmp3lame
+              - --disable-programs
+              - --enable-ffmpeg
+              - --disable-doc
+              - --disable-htmlpages
+              - --disable-manpages
+              - --disable-podpages
+              - --disable-txtpages
+              - --enable-gpl
+            sources:
+              - type: archive
+                url: https://ffmpeg.org/releases/ffmpeg-5.1.2.tar.xz
+                sha256: 619e706d662c8420859832ddc259cd4d4096a48a2ce1eefd052db9e440eef3dc
     - name: ArtOfReading
       sources:
           # This .deb contains only PNG image files with a few text files such

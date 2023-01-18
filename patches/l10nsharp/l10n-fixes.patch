@@ -1,0 +1,20 @@
+diff --git a/src/L10NSharp/CodeReader/StringExtractor.cs b/src/L10NSharp/CodeReader/StringExtractor.cs
+index 2cdc2a2..9e5fc7f 100644
+--- a/src/L10NSharp/CodeReader/StringExtractor.cs
++++ b/src/L10NSharp/CodeReader/StringExtractor.cs
+@@ -111,7 +111,14 @@ public void ExtractFromNamespaces()
+ 						Debug.WriteLine(errorMsg);
+ 					}
+ 					else
+-						throw;
++					{
++						// Rethrowing the exception just ends up crashing the calling program, which is way overkill.
++						// Provide the exception details in case they may be useful, but continue on.
++						var errorMsg = $"DEBUG: unexpected exception in StringExtractor.DoExtractingWork() for {type.FullName}:{Environment.NewLine}{e}";
++						if (OutputErrorsToConsole)
++							Console.WriteLine(errorMsg);
++						Debug.WriteLine(errorMsg);
++					}
+ 				}
+ 			}
+ 
