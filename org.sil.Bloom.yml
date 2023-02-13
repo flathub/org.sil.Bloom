@@ -88,7 +88,7 @@ modules:
       sources:
           - type: git
             url: https://github.com/BloomBooks/BloomDesktop.git
-            commit: 3bad77c612e5bbbf8befefe403487b0df74f7f67
+            commit: a2f3f5e6fa67a9a8ef071a2e692d38f9e2f20fd6
           # Bloom nuget dependencies
           # To regenerate bloom-build-sources-nuget.yml:
           #   ./compose-nuget-sources bloom-build-sources-nuget.yml nuget_packages ./extra/buildPackages.config
