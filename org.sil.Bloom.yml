@@ -401,6 +401,7 @@ modules:
                 - --disable-cups
                 - --disable-dbus
                 - --enable-dynamic
+                - --disable-hidden-visibility
                 - --disable-gtk
                 - --with-drivers=FILES
             make-args:
@@ -410,13 +411,8 @@ modules:
                 - soinstall
             sources:
                 - type: archive
-                  url: https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs9561/ghostscript-9.56.1.tar.xz
-                  sha256: d43406805650009b42c3d5f6dc535233454533c1e27c13a77dd1d462a056b8e4
-                  x-checker-data:
-                      type: html
-                      url: https://ghostscript.com/releases/
-                      version-pattern: The latest release is Ghostscript ([\d\.]+)
-                      url-template: https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs${version0}${version1}${version2}/ghostscript-$version.tar.xz
+                  url: https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10011/ghostscript-10.01.1.tar.gz
+                  sha256: 4df18a808cd4369f25e02dbcec2f133cb6d674627b2c6b1502020e58d43e32ce
             cleanup:
                 - /share/doc
                 - /share/ghostscript/*/doc
@@ -527,8 +523,8 @@ modules:
             sources:
               - type: git
                 url: https://github.com/ThomasDickey/xterm-snapshots.git
-                tag: xterm-364
-                commit: 6b07755324d62a64cfcf11ef750670c2ede583ca
+                tag: xterm-379
+                commit: 2ba96df676100dcb013e15f7392718e1b793907c
                 x-checker-data:
                   type: anitya
                   project-id: 5272
@@ -538,12 +534,8 @@ modules:
               - name: libXaw
                 sources: &libXaw-sources
                   - type: archive
-                    url: https://xorg.freedesktop.org/releases/individual/lib/libXaw-1.0.12.tar.bz2
-                    sha256: 96fc314874fce9979556321d1d6ee00b5baf32fb333b7278853b4983bc3cdbf6
-                    x-checker-data:
-                      type: anitya
-                      project-id: 1766
-                      url-template: https://xorg.freedesktop.org/releases/individual/lib/libXaw-$version.tar.bz2
+                    url: https://www.x.org/archive/individual/lib/libXaw-1.0.15.tar.xz
+                    sha256: ab35f70fde9fb02cc71b342f654846a74328b74cb3a0703c02d20eddb212754a
               - name: libXaw-32bit
                 sources: *libXaw-sources
               - name: ncurses
