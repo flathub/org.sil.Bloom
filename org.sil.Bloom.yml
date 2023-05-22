@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-app-id: org.sil.Bloom
+app-id: org.sil.BloomBeta
 
 runtime: org.gnome.Platform
 # This appears to be the last runtime version that Bloom will run on.
@@ -49,9 +49,9 @@ finish-args:
     - --device=all
     # enable file saving
     - --system-talk-name=org.freedesktop.FileManager1
-rename-desktop-file: bloom.desktop
-rename-appdata-file: bloom.appdata.xml
-command: bloom
+rename-desktop-file: bloom-beta.desktop
+rename-appdata-file: bloom-beta.appdata.xml
+command: bloom-beta
 
 modules:
     - name: BloomDesktop
@@ -77,7 +77,7 @@ modules:
               yarn config set yarn-offline-mirror ${FLATPAK_BUILDER_BUILDDIR}/flatpak-node/yarn-mirror
               cp local-extra/Makefile .
               export NODE_OPTIONS=--max-old-space-size=1536
-              if [ -f local-extra/build_number.env ]; then . local-extra/build_number.env; else export FULL_BUILD_NUMBER=5.3.1.0; fi
+              if [ -f local-extra/build_number.env ]; then . local-extra/build_number.env; else export FULL_BUILD_NUMBER=5.5.1.0; fi
               make -B build
               make -B install
 
@@ -88,7 +88,7 @@ modules:
       sources:
           - type: git
             url: https://github.com/BloomBooks/BloomDesktop.git
-            commit: cef588e6e721772135da32b23854e7c2152df90c
+            commit: 7879b1f9c05fbb014c7e6bf4948db3f746c4a121
           # Bloom nuget dependencies
           # To regenerate bloom-build-sources-nuget.yml:
           #   ./compose-nuget-sources bloom-build-sources-nuget.yml nuget_packages ./extra/buildPackages.config
@@ -113,24 +113,9 @@ modules:
                     mv "${NUGET_DEST}/MarkdownDeep.NET.1.5.0/lib/.NetFramework%203.5" "${NUGET_DEST}/MarkdownDeep.NET.1.5.0/lib/.NetFramework 3.5"
                     chmod 755 "${NUGET_DEST}"/sqlite-net-pcl.1.7.335/*.*
                     chmod 755 "${NUGET_DEST}"/sqlite-net-pcl.1.7.335/lib/netstandard2.0/SQLite-net.*
-                    # copy artifacts from internal libpalaso and geckofx builds to where the nuget packages have been installed.
+                    chmod 755 "${NUGET_DEST}"/L10NSharp.6.0.0/lib/net461/L10NSharp.*
+                    # copy artifacts from internal geckofx builds to where the nuget packages have been installed.
                     # (we need some things the nuget package includes, but want to replace the actual assemblies and add debug info)
-                    cp --verbose --force /app/libpalaso/SIL.Core.dll "${NUGET_DEST}"/SIL.Core.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Core.pdb "${NUGET_DEST}"/SIL.Core.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Core.Desktop.dll "${NUGET_DEST}"/SIL.Core.Desktop.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Core.Desktop.pdb "${NUGET_DEST}"/SIL.Core.Desktop.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Media.dll "${NUGET_DEST}"/SIL.Media.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Media.pdb "${NUGET_DEST}"/SIL.Media.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.dll "${NUGET_DEST}"/SIL.Windows.Forms.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.pdb "${NUGET_DEST}"/SIL.Windows.Forms.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.GeckoBrowserAdapter.dll "${NUGET_DEST}"/SIL.Windows.Forms.GeckoBrowserAdapter.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.GeckoBrowserAdapter.pdb "${NUGET_DEST}"/SIL.Windows.Forms.GeckoBrowserAdapter.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.Keyboarding.dll "${NUGET_DEST}"/SIL.Windows.Forms.Keyboarding.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.Keyboarding.pdb "${NUGET_DEST}"/SIL.Windows.Forms.Keyboarding.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.WritingSystems.dll "${NUGET_DEST}"/SIL.Windows.Forms.WritingSystems.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.Windows.Forms.WritingSystems.pdb "${NUGET_DEST}"/SIL.Windows.Forms.WritingSystems.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.WritingSystems.dll "${NUGET_DEST}"/SIL.WritingSystems.9.0.1-beta0015/lib/net461/
-                    cp --verbose --force /app/libpalaso/SIL.WritingSystems.pdb "${NUGET_DEST}"/SIL.WritingSystems.9.0.1-beta0015/lib/net461/
                     rm "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/Geckofx-*.dll.mdb
                     cp --verbose --force /app/geckofx/Geckofx-Core.dll "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
                     cp --verbose --force /app/geckofx/Geckofx-Core.dll.config "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
@@ -138,16 +123,14 @@ modules:
                     cp --verbose --force /app/geckofx/Geckofx-Winforms.dll "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
                     cp --verbose --force /app/geckofx/Geckofx-Winforms.dll.config "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
                     cp --verbose --force /app/geckofx/Geckofx-Winforms.pdb "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
-                    cp --verbose --force /app/l10nsharp/L10NSharp.dll "${NUGET_DEST}"/L10NSharp.5.0.0-beta0088/lib/net461/
-                    cp --verbose --force /app/l10nsharp/L10NSharp.pdb "${NUGET_DEST}"/L10NSharp.5.0.0-beta0088/lib/net461/
-                    rm -rf /app/libpalaso /app/geckofx /app/l10nsharp
+                    rm -rf /app/geckofx
 
 
           # Bloom dependencies
           # Find updates via Bloom.git with a command like:
           #   git log -p -- build/getDependencies-Linux.sh
           # Manually apply changes by editing bloom-sources-urls-input.yml.
-          # Regenerate input sources:
+          # regenerate input sources:
           #   ./compose-url-sources bloom-sources-urls-input.yml bloom-sources-urls.yml
           - bloom-sources-urls.yml
           - type: shell
@@ -157,11 +140,11 @@ modules:
                     set -xueo pipefail
                     pwd
                     mkdir -p "DistFiles/pdf" && unzip -uqo Downloads/pdfjs-viewer.zip -d "DistFiles/pdf"
-          # python3 flatpak-builder-tools/node/flatpak-node-generator.py -o bloom-sources-browser-node.json yarn ../src/BloomBrowserUI/yarn.lock
-          # (or flatpak-node-generator -o bloom-sources-browser-node.json yarn ../BloomDesktop/src/BloomBrowserUI/yarn.lock)
+          # regenerate with this command:
+          # flatpak-node-generator -o bloom-sources-browser-node.json yarn .../src/BloomBrowserUI/yarn.lock
           - bloom-sources-browser-node.json
-          # python3 flatpak-builder-tools/node/flatpak-node-generator.py -o bloom-sources-content-node.json yarn ../src/content/yarn.lock
-          # (or flatpak-node-generator -o bloom-sources-content-node.json yarn /d/github/BloomDesktop/src/content/yarn.lock)
+          # regenerate with this command:
+          # flatpak-node-generator -o bloom-sources-content-node.json yarn .../src/content/yarn.lock
           - bloom-sources-content-node.json
           - type: patch
             path: patches/BloomDesktop/BuildFileFixesForFlatpak.patch
@@ -425,7 +408,7 @@ modules:
                   url: https://sourceforge.net/projects/graphicsmagick/files/graphicsmagick/1.3.35/GraphicsMagick-1.3.35.tar.bz2
                   sha256: 7fd0b49903eb35df4ab5ca76139ab3f023f47485a4913fbdcf5c642c6e5f01fc
           - python3-aeneas.yml
-          # msbuild is needed for building libpalaso.yml and geckofx.  It's the msbuild tied to the mono6 sdk.  (I don't know why it isn't part of that sdk!)
+          # msbuild is needed for building geckofx.  It's the msbuild tied to the mono6 sdk.  (I don't know why it isn't part of that sdk!)
           # We already have another msbuild (mono5-sil-msbuild) tied to mono5-sil which is installed in /app for building BloomDesktop.
           - name: msbuild
             sources:
@@ -438,7 +421,6 @@ modules:
                 - tar xf data.tar.xz
                 - sed -e 's|/usr/|/usr/lib/sdk/mono6/|g' -i usr/bin/msbuild
                 - cp -a usr/. /usr/lib/sdk/mono6/
-          - libpalaso.yml
           - name: ca-certificates
             sources:
                 - type: file
@@ -475,7 +457,6 @@ modules:
                   commit: a77e5ba72728630ee02b95892d5fd0c219f87c98
                 - type: patch
                   path: patches/geckofx/FixesForFlatpak.patch
-          - l10nsharp.yml
           # Andika Fonts
           # Extract fonts. The 'type: archive', 'archive-type: zip' has some trouble working,
           # so manually extract.
@@ -541,8 +522,8 @@ modules:
               - name: ncurses
                 sources:
                   - type: archive
-                    url: https://invisible-mirror.net/archives/ncurses/current/ncurses-6.3-20220827.tgz
-                    sha256: "e9daea489c50be3c325db8d49891e412a75c64aa0cfb3252d0b3d8f02529b748"
+                    url: https://invisible-mirror.net/archives/ncurses/ncurses-6.4.tar.gz
+                    sha256: 6931283d9ac87c5073f30b6290c4c75f21632bb4fc3603ac8100812bed248159
           # for ffmpeg
           - name: libx264
             config-opts:

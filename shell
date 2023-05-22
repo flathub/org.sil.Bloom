@@ -1,3 +1,3 @@
 #!/bin/sh
 export LD_PRELOAD=
-flatpak run --command=bash org.sil.Bloom
+flatpak run --command=bash org.sil.BloomBeta

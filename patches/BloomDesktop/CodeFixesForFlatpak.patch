@@ -85,10 +85,10 @@ index 02a8d6878..262018d0e 100644
  				// According to the xchm developer, something like this should work:
  				// xchm file:jdk150.chm#xchm:/jdk150/api/java/applet/package-summary.html
 diff --git a/src/BloomExe/ImageProcessing/ImageUtils.cs b/src/BloomExe/ImageProcessing/ImageUtils.cs
-index 6a4e11978..da9d53174 100644
+index b314b4617..0459e75eb 100644
 --- a/src/BloomExe/ImageProcessing/ImageUtils.cs
 +++ b/src/BloomExe/ImageProcessing/ImageUtils.cs
-@@ -881,7 +881,7 @@ private static string GetGraphicsMagickPath()
+@@ -1029,7 +1029,7 @@ private static string GetGraphicsMagickPath()
  		{
  			if (Platform.IsLinux)
  			{
@@ -98,7 +98,7 @@ index 6a4e11978..da9d53174 100644
  			else
  			{
 diff --git a/src/BloomExe/NonFatalProblem.cs b/src/BloomExe/NonFatalProblem.cs
-index f3464543f..e1bf73a84 100644
+index b61b85a63..cebeda483 100644
 --- a/src/BloomExe/NonFatalProblem.cs
 +++ b/src/BloomExe/NonFatalProblem.cs
 @@ -35,6 +35,7 @@ public class NonFatalProblem
@@ -110,10 +110,10 @@ index f3464543f..e1bf73a84 100644
  			s_expectedByUnitTest?.ProblemWasReported();
  
 diff --git a/src/BloomExe/Program.cs b/src/BloomExe/Program.cs
-index c89e78aa0..c4990c89a 100644
+index bf156b69b..8a2a83b26 100644
 --- a/src/BloomExe/Program.cs
 +++ b/src/BloomExe/Program.cs
-@@ -307,7 +307,7 @@ static int Main(string[] args1)
+@@ -308,7 +308,7 @@ static int Main(string[] args1)
  								using (var projectContext =
  									_applicationContainer.CreateProjectContext(fakeCollectionPath, true))
  								{
@@ -122,7 +122,7 @@ index c89e78aa0..c4990c89a 100644
  									{
  										var msg = LocalizationManager.GetString("TeamCollection.QuitOtherBloom",
  											"Please close Bloom before joining a Team Collection");
-@@ -361,7 +361,7 @@ static int Main(string[] args1)
+@@ -362,7 +362,7 @@ static int Main(string[] args1)
  						Settings.Default.Save();
  
  						// and now we need to get the lock as usual before going on to load the new collection.
@@ -131,7 +131,7 @@ index c89e78aa0..c4990c89a 100644
  							return 1;
  						gotUniqueToken = true;
  					}
-@@ -371,7 +371,7 @@ static int Main(string[] args1)
+@@ -372,7 +372,7 @@ static int Main(string[] args1)
  						HandleDownload(args[0]);
  						// If another instance is running, this one has served its purpose and can exit right away. Otherwise,
  						// carry on with starting up normally.  See https://silbloom.myjetbrains.com/youtrack/issue/BL-3822.
@@ -140,16 +140,16 @@ index c89e78aa0..c4990c89a 100644
  							return 0;
  						gotUniqueToken = true;
  					}
-@@ -381,7 +381,7 @@ static int Main(string[] args1)
- 						// BloomLibrary starts a new Bloom process even when one is already running.  But that is taken care of in the
- 						// other branch of this if/else.  So quit if we find another instance of Bloom running at this point.
- 						// (A message will pop up to tell the user about this situation if it happens.)
--						if (!UniqueToken.AcquireToken(_mutexId, "Bloom"))
-+						if (!AcquireUniqueToken("Bloom"))
- 							return 1;
+@@ -388,7 +388,7 @@ static int Main(string[] args1)
+ 							// BloomLibrary starts a new Bloom process even when one is already running.  But that is taken care of in the
+ 							// other branch of this if/else.  So quit if we find another instance of Bloom running at this point.
+ 							// (A message will pop up to tell the user about this situation if it happens.)
+-							if (!UniqueToken.AcquireToken(_mutexId, "Bloom"))
++							if (!AcquireUniqueToken("Bloom"))
+ 								return 1;
+ 						}
  						gotUniqueToken = true;
- 					}
-@@ -507,6 +507,61 @@ static int Main(string[] args1)
+@@ -525,6 +525,61 @@ static int Main(string[] args1)
  			return 0;
  		}
  
@@ -211,7 +211,7 @@ index c89e78aa0..c4990c89a 100644
  		/// <summary>
  		/// Sets up different analytics channels depending on Debug or not.
  		/// Also determines whether or not Registration should occur.
-@@ -641,7 +696,7 @@ public static void RestartBloom(bool hardExit, string args = null)
+@@ -659,7 +714,7 @@ public static void RestartBloom(bool hardExit, string args = null)
  				{
  					// This is needed until the day comes (if it ever does) when we can use the
  					// system mono on Linux.
@@ -221,7 +221,7 @@ index c89e78aa0..c4990c89a 100644
  						args = "\"" + Application.ExecutablePath + "\"";
  					else
 diff --git a/src/BloomExe/Publish/Android/BloomPubMaker.cs b/src/BloomExe/Publish/Android/BloomPubMaker.cs
-index f32829110..6154ff04a 100644
+index 32e03335a..385942363 100644
 --- a/src/BloomExe/Publish/Android/BloomPubMaker.cs
 +++ b/src/BloomExe/Publish/Android/BloomPubMaker.cs
 @@ -33,6 +33,8 @@ public static class BloomPubMaker
@@ -233,7 +233,7 @@ index f32829110..6154ff04a 100644
  		public static void CreateBloomPub(BookInfo bookInfo, AndroidPublishSettings settings, string outputFolder, BookServer bookServer, IWebSocketProgress progress )
  		{
  			var outputPath = Path.Combine(outputFolder, Path.GetFileName(bookInfo.FolderPath) + BookCompressor.BloomPubExtensionWithDot);
-@@ -158,14 +160,15 @@ public static void CreateBloomPub(string outputPath, Book.Book book, BookServer
+@@ -159,15 +161,16 @@ public static void CreateBloomPub(string outputPath, Book.Book book, BookServer
  
  			// Do this after processing interactive pages, as they can satisfy the criteria for being 'blank'
  			HashSet<string> fontsUsed = null;
@@ -249,15 +249,17 @@ index f32829110..6154ff04a 100644
  					warningMessages, keepPageLabels:settings?.WantPageLabels??false);
  				PublishHelper.SendBatchedWarningMessagesToProgress(warningMessages, progress);
 -				fontsUsed = helper.FontsUsed;
+-				BloomPubFontsAndLangsUsed = helper.FontsAndLangsUsed;
 +				fontsUsed = _publishHelper.FontsUsed;
++				BloomPubFontsAndLangsUsed = _publishHelper.FontsAndLangsUsed;
  			}
  			if (!modifiedBook.IsTemplateBook)
  				modifiedBook.RemoveBlankPages(settings?.LanguagesToInclude);
 diff --git a/src/BloomExe/Publish/AudioProcessor.cs b/src/BloomExe/Publish/AudioProcessor.cs
-index 1f0121e8e..460382b68 100644
+index ed079a29d..e6de0d40c 100644
 --- a/src/BloomExe/Publish/AudioProcessor.cs
 +++ b/src/BloomExe/Publish/AudioProcessor.cs
-@@ -140,7 +140,7 @@ public static bool DoesAudioExistForSegment(string bookFolderPath, string record
+@@ -144,7 +144,7 @@ public static bool DoesAudioExistForSegment(string bookFolderPath, string record
  		/// </summary>
  		public static string MergeAudioFiles(IEnumerable<string> mergeFiles, string combinedAudioPath)
  		{
@@ -267,7 +269,7 @@ index 1f0121e8e..460382b68 100644
  				ffmpeg = Path.Combine(BloomFileLocator.GetCodeBaseFolder(), "ffmpeg.exe");
  			if (RobustFile.Exists(ffmpeg))
 diff --git a/src/BloomExe/Publish/BloomLibrary/BloomLibraryUploadControl.cs b/src/BloomExe/Publish/BloomLibrary/BloomLibraryUploadControl.cs
-index abf517e50..1b08b1789 100644
+index 1bcc66d43..adac0afdc 100644
 --- a/src/BloomExe/Publish/BloomLibrary/BloomLibraryUploadControl.cs
 +++ b/src/BloomExe/Publish/BloomLibrary/BloomLibraryUploadControl.cs
 @@ -879,7 +879,7 @@ private void BulkUpload(string rootFolderPath)
@@ -323,24 +325,11 @@ index abf517e50..1b08b1789 100644
  			}
  			// Neither konsole nor qterminal will launch with Bloom.  The ones above have been tested on Wasta 20.
  			// symbol lookup error: /usr/lib/x86_64-linux-gnu/qt5/plugins/styles/libqgtk2style.so: undefined symbol: gtk_combo_box_entry_new
-diff --git a/src/BloomExe/Publish/Epub/EpubMaker.cs b/src/BloomExe/Publish/Epub/EpubMaker.cs
-index 84baf3d86..2bb33c777 100644
---- a/src/BloomExe/Publish/Epub/EpubMaker.cs
-+++ b/src/BloomExe/Publish/Epub/EpubMaker.cs
-@@ -841,7 +841,7 @@ private void AddAudioOverlay(HtmlDom pageDom, string pageDocName)
- 							// A short file may have only one carriage-return separated section of output, while a very long file may
- 							// have more sections than this.
- 							var args = String.Format("-v quiet -stats -i \"{0}\" -f null -", path);
--							var result = CommandLineRunner.Run("/usr/bin/ffmpeg", args, "", 20 * 10, new SIL.Progress.NullProgress());
-+							var result = CommandLineRunner.Run("/app/bin/ffmpeg", args, "", 20 * 10, new SIL.Progress.NullProgress());
- 							var output = result.ExitCode == 0 ? result.StandardError : null;
- 							string timeString = null;
- 							if (!string.IsNullOrEmpty(output))
 diff --git a/src/BloomExe/Publish/PDF/PdfViewer.cs b/src/BloomExe/Publish/PDF/PdfViewer.cs
-index 8c58b29f5..3d27f4e82 100644
+index 607b0f857..874747011 100644
 --- a/src/BloomExe/Publish/PDF/PdfViewer.cs
 +++ b/src/BloomExe/Publish/PDF/PdfViewer.cs
-@@ -233,7 +233,7 @@ private bool TryGhostcriptPrint()
+@@ -276,7 +276,7 @@ private bool TryGhostcriptPrint()
  			// setup in Ubuntu.  It handles PDF automatically.  gtklp is a graphical
  			// front end to the printer service that allows the user to specify the
  			// printer, paper size, and other parameters that may need to be tweaked.
@@ -349,7 +338,7 @@ index 8c58b29f5..3d27f4e82 100644
  			systemSpecificArgs = "";
  #else
  			var gsKey = Registry.LocalMachine.OpenSubKey(@"Software\GPL Ghostscript");
-@@ -345,6 +345,9 @@ public void BrowserPrint()
+@@ -388,6 +388,9 @@ public void BrowserPrint()
  				}
  				finally {
  					Marshal.ReleaseComObject (print);
@@ -373,10 +362,10 @@ index f687a8604..1b9719144 100644
  				exePath = FindGhostcriptOnWindows();
  			if (!String.IsNullOrWhiteSpace(exePath) && File.Exists(exePath))
 diff --git a/src/BloomExe/Publish/PublishModel.cs b/src/BloomExe/Publish/PublishModel.cs
-index 63cb30e97..3f7ed1a71 100644
+index a1ad96121..ac5940498 100644
 --- a/src/BloomExe/Publish/PublishModel.cs
 +++ b/src/BloomExe/Publish/PublishModel.cs
-@@ -294,8 +294,9 @@ internal DisplayModes DisplayMode
+@@ -300,8 +300,9 @@ internal DisplayModes DisplayMode
  			set
  			{
  				_currentDisplayMode = value;
@@ -389,10 +378,10 @@ index 63cb30e97..3f7ed1a71 100644
  		}
  
 diff --git a/src/BloomExe/Utils/MiscUtils.cs b/src/BloomExe/Utils/MiscUtils.cs
-index 23c8c967a..6c331e7ba 100644
+index 018dc97f8..09f7faebe 100644
 --- a/src/BloomExe/Utils/MiscUtils.cs
 +++ b/src/BloomExe/Utils/MiscUtils.cs
-@@ -233,7 +233,7 @@ public static string ColorToHtmlCode(Color color)
+@@ -237,7 +237,7 @@ public static string ColorToHtmlCode(Color color)
  		/// <returns></returns>
  		public static string FindFfmpegProgram()
  		{
@@ -401,6 +390,15 @@ index 23c8c967a..6c331e7ba 100644
  			if (SIL.PlatformUtilities.Platform.IsWindows)
  				ffmpeg = Path.Combine(BloomFileLocator.GetCodeBaseFolder(), "ffmpeg.exe");
  			return RobustFile.Exists(ffmpeg) ? ffmpeg : string.Empty;
+@@ -483,7 +483,7 @@ public static TimeSpan GetMp3TimeSpan(string path, bool throwOnInvalidData = fal
+ 				// A short file may have only one carriage-return separated section of output, while a very long file may
+ 				// have more sections than this.
+ 				var args = String.Format("-v quiet -stats -i \"{0}\" -f null -", path);
+-				var result = CommandLineRunner.Run("/usr/bin/ffmpeg", args, "", 20 * 10, new SIL.Progress.NullProgress());
++				var result = CommandLineRunner.Run("/app/bin/ffmpeg", args, "", 20 * 10, new SIL.Progress.NullProgress());
+ 				var output = result.ExitCode == 0 ? result.StandardError : null;
+ 				string timeString = null;
+ 				if (!string.IsNullOrEmpty(output))
 diff --git a/src/BloomExe/web/controllers/AudioSegmentationApi.cs b/src/BloomExe/web/controllers/AudioSegmentationApi.cs
 index 32fda207a..eda12ba56 100644
 --- a/src/BloomExe/web/controllers/AudioSegmentationApi.cs

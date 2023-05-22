@@ -31,7 +31,7 @@ install:
 	chmod -R a+rX,og-w ${BLOOMLIB}/browser
 	# Install wrapper script
 	install -d ${INSTALLATION_PREFIX}/bin
-	install debian/bloom ${INSTALLATION_PREFIX}/bin
+	install debian/bloom-beta ${INSTALLATION_PREFIX}/bin
 	# Add to Applications menu
 	install -d ${INSTALLATION_PREFIX}/share/pixmaps
 	install -d ${INSTALLATION_PREFIX}/share/icons/hicolor/48x48/mimetypes/
@@ -41,7 +41,7 @@ install:
 	install -m 644 debian/bloom.png ${INSTALLATION_PREFIX}/share/icons/hicolor/48x48/mimetypes/org.sil.Bloom.png
 	install -m 644 debian/bloom.svg ${INSTALLATION_PREFIX}/share/icons/hicolor/scalable/mimetypes/org.sil.Bloom.svg
 	install -d ${INSTALLATION_PREFIX}/share/applications
-	desktop-file-install --dir ${INSTALLATION_PREFIX}/share/applications --set-icon=org.sil.Bloom debian/bloom.desktop
+	desktop-file-install --dir ${INSTALLATION_PREFIX}/share/applications --set-icon=org.sil.Bloom debian/bloom-beta.desktop
 	# Install icon for our mime type so that it shows up as icon for a bloompack
 	install -m 644 debian/BloomPack.png ${INSTALLATION_PREFIX}/share/icons/hicolor/48x48/mimetypes/application-bloom.png
 	install -m 644 debian/BloomPack.svg ${INSTALLATION_PREFIX}/share/icons/hicolor/scalable/mimetypes/application-bloom.svg
@@ -53,9 +53,11 @@ install:
 	install -m 644 debian/JoinBloomTC.svg ${INSTALLATION_PREFIX}/share/icons/hicolor/scalable/mimetypes/application-bloom-join-team.svg
 	# Add AppStream metadata file
 	install -d ${INSTALLATION_PREFIX}/share/appdata
-	install -m 644 debian/bloom.appdata.xml ${INSTALLATION_PREFIX}/share/appdata
+	install -m 644 debian/bloom-beta.appdata.xml ${INSTALLATION_PREFIX}/share/appdata
 	# allow GTK2 to co-exist with mono-sil and Bloom
 	ln -s ${BLOOMLIB}/Firefox/libgtk-x11-2.0.so.0 /app/lib/mono/gac/System.Windows.Forms/4.0.0.0__b77a5c561934e089
+	# allow broken search for libMono.Unix.so to succeed
+	ln -s ${BLOOMLIB}/runtimes ${BLOOMLIB}/libruntimes
 	# Remove unwanted files
 	cd ${BLOOMLIB} && rm -rf AxInterop* BloomTests* Interop* Moq* nunit* NUnit* AndikaNewBasic ffmpeg ghostscript Microsoft.WindowsAPICodePack*
 	find ${BLOOMLIB} -name '*.map' -print0 | xargs -0 rm -f
@@ -69,6 +71,16 @@ install:
 	find ${BLOOMLIB} -name 'irrKlang.NET4.dll' -print0 | xargs -0 rm -f
 	find ${BLOOMLIB} -name 'win-x86' -type d -print0 | xargs -0 rm -rf
 	find ${BLOOMLIB} -name 'win-x64' -type d -print0 | xargs -0 rm -rf
+	find ${BLOOMLIB} -name 'android-arm' -type d -print0 | xargs -0 rm -rf
+	find ${BLOOMLIB} -name 'android-arm64' -type d -print0 | xargs -0 rm -rf
+	find ${BLOOMLIB} -name 'android-x64' -type d -print0 | xargs -0 rm -rf
+	find ${BLOOMLIB} -name 'android-x86' -type d -print0 | xargs -0 rm -rf
+	find ${BLOOMLIB} -name 'linux-arm' -type d -print0 | xargs -0 rm -rf
+	find ${BLOOMLIB} -name 'linux-arm64' -type d -print0 | xargs -0 rm -rf
+	find ${BLOOMLIB} -name 'linux-armel' -type d -print0 | xargs -0 rm -rf
+	find ${BLOOMLIB} -name 'linux-x86' -type d -print0 | xargs -0 rm -rf
+	find ${BLOOMLIB} -name 'osx-x64' -type d -print0 | xargs -0 rm -rf
+	find ${BLOOMLIB} -name 'osx-arm64' -type d -print0 | xargs -0 rm -rf
 	find ${BLOOMLIB} -name '*Interop.AcroPDFLib.*' -print0 | xargs -0 rm -f
 	# These are needed to compile libpalaso on Windows, but aren't really used even there I suspect.
 	find ${BLOOMLIB} -name 'AtkSharp.dll' -print0 | xargs -0 rm -f
