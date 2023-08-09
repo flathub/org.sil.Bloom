@@ -45,9 +45,19 @@
   sha512: 420369a7247da1352df7b30678a983ba9ba727a9b297324fe068b38012c7cb588162fdfc472d0873d55df84a92e00059b4242c582534151cf01528abfe599e5c
   dest: nuget_packages
 - type: file
-  url: https://api.nuget.org/v3-flatcontainer/epplus/5.6.4/epplus.5.6.4.nupkg
-  dest-filename: EPPlus.5.6.4.nupkg
-  sha512: 33520399ce7cf1fca73ef6b8c274fa597f3a458899f40a28a83966e825691b19979621339eb85814f18c41ede01e65e9d83b5e48afb5ea87cf711f2fa290f7dc
+  url: https://api.nuget.org/v3-flatcontainer/epplus/6.2.4/epplus.6.2.4.nupkg
+  dest-filename: EPPlus.6.2.4.nupkg
+  sha512: 4a66030f7c433b7f9834d0a907bbda2973626c10fae9b8f3c8894747c2a25eac15569247300176bc61ad65cbd910ef843d6574fb8bcbe4436c3d80e1a6d4fb78
+  dest: nuget_packages
+- type: file
+  url: https://api.nuget.org/v3-flatcontainer/epplus.interfaces/6.1.1/epplus.interfaces.6.1.1.nupkg
+  dest-filename: EPPlus.Interfaces.6.1.1.nupkg
+  sha512: 53c105b8065e0cfcd494d5aeeb877bec1ed829b17564d8ebdc3c1ad4286a12c074324a313f967a0c5aae4ab732fc5d1f2ce81ec40078e0785f15dc39d62a499c
+  dest: nuget_packages
+- type: file
+  url: https://api.nuget.org/v3-flatcontainer/epplus.system.drawing/6.1.1/epplus.system.drawing.6.1.1.nupkg
+  dest-filename: EPPlus.System.Drawing.6.1.1.nupkg
+  sha512: 674704f8f6e9233a2f3e6b23a48ffbf423ae8a92b674134773b28f139935e2bed0cc761fb85283acefc08d931a7bd5147b1ef0df7abe70579e14fd28ec053922
   dest: nuget_packages
 - type: file
   url: https://api.nuget.org/v3-flatcontainer/enchant.net/1.4.2/enchant.net.1.4.2.nupkg
@@ -180,44 +190,44 @@
   sha512: cd222c7731ee524eedcbf43c54612385ea0539c4309c4df1a1a12e93fbc3d6fade897b3df7a7fd19004f4708bfa94c6975c52e726c0664aa04c7ad2eb8d9c9f9
   dest: nuget_packages
 - type: file
-  url: https://api.nuget.org/v3-flatcontainer/sil.core/12.0.1-beta0003/sil.core.12.0.1-beta0003.nupkg
-  dest-filename: SIL.Core.12.0.1-beta0003.nupkg
-  sha512: 84910433f2d95318749c7acfdd0363cfd27d91f9a059c65f9c537bb7b39ff0ce7a5d1d886b3246d2fcaa043775f993c39b8d0a60248db14cd05c15c28ead04f5
+  url: https://api.nuget.org/v3-flatcontainer/sil.core/12.1.0-beta0015/sil.core.12.1.0-beta0015.nupkg
+  dest-filename: SIL.Core.12.1.0-beta0015.nupkg
+  sha512: 9aecc9fb4d073fee4cef22ed6f1e716e9514a05d70dce078c475396eae6ddeb713729cc2d5f592586e0c660eec2219d71a194c4e6f4c25ab5182d511412dbe89
   dest: nuget_packages
 - type: file
-  url: https://api.nuget.org/v3-flatcontainer/sil.core.desktop/12.0.1-beta0003/sil.core.desktop.12.0.1-beta0003.nupkg
-  dest-filename: SIL.Core.Desktop.12.0.1-beta0003.nupkg
-  sha512: 3b2101fff83fcef2e87bd399ffaed3d57db1f7f202aab70a5bc98c42a21672ce2d741ef7cb5be861601eda928e1d713c7bdad6235555706e924c8f76299f8a3a
+  url: https://api.nuget.org/v3-flatcontainer/sil.core.desktop/12.1.0-beta0015/sil.core.desktop.12.1.0-beta0015.nupkg
+  dest-filename: SIL.Core.Desktop.12.1.0-beta0015.nupkg
+  sha512: 9a3cf681937e515f7f16144c0b24a2c7a3e7cf49cf8734c0ef75c473b44a20344f671e600bd50e966f0072df386510de397b75a37bd6a2a5264c04b7df199ca0
   dest: nuget_packages
 - type: file
-  url: https://api.nuget.org/v3-flatcontainer/sil.media/12.0.1-beta0003/sil.media.12.0.1-beta0003.nupkg
-  dest-filename: SIL.Media.12.0.1-beta0003.nupkg
-  sha512: 6c9e7f54a0814d1d70d34c919b56ae97b2aa6599e8f77dbf5f7dc326c2c3005f10adb779eb2565a3a17e4e35adefcd765f04218e0ad098f1a20424e24d499c72
+  url: https://api.nuget.org/v3-flatcontainer/sil.media/12.1.0-beta0015/sil.media.12.1.0-beta0015.nupkg
+  dest-filename: SIL.Media.12.1.0-beta0015.nupkg
+  sha512: 75fd02f0b0ba39990e73fbaa0f3079057d34fed260696df451e395faf42d069efe8eb739dc311ad94941213496faaaec75e1f8713b5d5d8bef6cad2144dd295c
   dest: nuget_packages
 - type: file
-  url: https://api.nuget.org/v3-flatcontainer/sil.windows.forms/12.0.1-beta0003/sil.windows.forms.12.0.1-beta0003.nupkg
-  dest-filename: SIL.Windows.Forms.12.0.1-beta0003.nupkg
-  sha512: a5a519c56d51b62bcdb379d6b4fcf45a0a6a8ac986826702e4fca1901f971c0ed7fc316be48b5bc1aa085f55cf0b499689340704acf5690fdf1096e5fcd248c1
+  url: https://api.nuget.org/v3-flatcontainer/sil.windows.forms/12.1.0-beta0015/sil.windows.forms.12.1.0-beta0015.nupkg
+  dest-filename: SIL.Windows.Forms.12.1.0-beta0015.nupkg
+  sha512: bf8c19a51270674d379ce1b606c2e1705a16d93af0f66f6e2162c77ffae51b869df330a238345cb3ce0bca64fa7607892f2ff4bce41a486be252237625626d69
   dest: nuget_packages
 - type: file
-  url: https://api.nuget.org/v3-flatcontainer/sil.windows.forms.geckobrowseradapter/12.0.1-beta0003/sil.windows.forms.geckobrowseradapter.12.0.1-beta0003.nupkg
-  dest-filename: SIL.Windows.Forms.GeckoBrowserAdapter.12.0.1-beta0003.nupkg
-  sha512: ffc45406d84ea755ff2c02632d552af6c80c53adeb1ed40f3b2fa03d4ae6349449c43ac5919226b372f6d4ac21e20b83eac278a8268d16ff2291a7d3530164cd
+  url: https://api.nuget.org/v3-flatcontainer/sil.windows.forms.geckobrowseradapter/12.1.0-beta0015/sil.windows.forms.geckobrowseradapter.12.1.0-beta0015.nupkg
+  dest-filename: SIL.Windows.Forms.GeckoBrowserAdapter.12.1.0-beta0015.nupkg
+  sha512: 3dd5feaa4f6a124c3e94044e04b5c6dcc0ee9941318538e928228be2f0aa45ae9b1a0172bb70ccdb146489c9d12859f76a55e93e3d4e3dc8f6f7145eddb294ef
   dest: nuget_packages
 - type: file
-  url: https://api.nuget.org/v3-flatcontainer/sil.windows.forms.keyboarding/12.0.1-beta0003/sil.windows.forms.keyboarding.12.0.1-beta0003.nupkg
-  dest-filename: SIL.Windows.Forms.Keyboarding.12.0.1-beta0003.nupkg
-  sha512: 95bb387969e9693dddebf6f62c7ee56b4902204e822fa0326e55a30e8ddafe3dba7f4ab5d8432f51c663c5dcaf7851f71a61696c26368d6a098a6d2da19cdac3
+  url: https://api.nuget.org/v3-flatcontainer/sil.windows.forms.keyboarding/12.1.0-beta0015/sil.windows.forms.keyboarding.12.1.0-beta0015.nupkg
+  dest-filename: SIL.Windows.Forms.Keyboarding.12.1.0-beta0015.nupkg
+  sha512: 874a99ffda603652ada44359d19d181c36d93c328ebde09d0683f9929c6221ba61004f4d4263c2d231708d5873c9d64ec6b8753d4c530fb08bc6150e3a2f23a8
   dest: nuget_packages
 - type: file
-  url: https://api.nuget.org/v3-flatcontainer/sil.windows.forms.writingsystems/12.0.1-beta0003/sil.windows.forms.writingsystems.12.0.1-beta0003.nupkg
-  dest-filename: SIL.Windows.Forms.WritingSystems.12.0.1-beta0003.nupkg
-  sha512: 9321f84b41b4545d1061626fb46169adf099606ef8614e98e081fc1ff8a640947821a37ed26cfdfe87869782b4b1707e457a8d70c040e9e1d0b86cd9125f91b0
+  url: https://api.nuget.org/v3-flatcontainer/sil.windows.forms.writingsystems/12.1.0-beta0015/sil.windows.forms.writingsystems.12.1.0-beta0015.nupkg
+  dest-filename: SIL.Windows.Forms.WritingSystems.12.1.0-beta0015.nupkg
+  sha512: 3cd561c538305364ea1406f213d50b79fa4dda06c615496cd0b6437f7e05edadd12d876e8d42ecea00f7674cd78673783344a673fd0bcf53c81bc0c4d279f0b2
   dest: nuget_packages
 - type: file
-  url: https://api.nuget.org/v3-flatcontainer/sil.writingsystems/12.0.1-beta0003/sil.writingsystems.12.0.1-beta0003.nupkg
-  dest-filename: SIL.WritingSystems.12.0.1-beta0003.nupkg
-  sha512: 03814a4f164b5740cdaf886dcabdd9a1903afa99e60135c794cebf61be2b9eacfb11f4e6c61198fed23da126f53f3017c3d33a18830665b925ca3d8ab31fae10
+  url: https://api.nuget.org/v3-flatcontainer/sil.writingsystems/12.1.0-beta0015/sil.writingsystems.12.1.0-beta0015.nupkg
+  dest-filename: SIL.WritingSystems.12.1.0-beta0015.nupkg
+  sha512: 4ecb1435e460dbf0ac6b6274ffcf4499d4207267d38f96234b433b77cc4fc4f8201feda5902a1454fd1b9842cb1a3cdb5e722a573b47e007f3330a997eee3c01
   dest: nuget_packages
 - type: file
   url: https://api.nuget.org/v3-flatcontainer/sqlitepclraw.bundle_green/2.0.3/sqlitepclraw.bundle_green.2.0.3.nupkg

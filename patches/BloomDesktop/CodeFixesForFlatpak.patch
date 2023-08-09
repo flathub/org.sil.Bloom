@@ -27,6 +27,19 @@ index 446fe59d6..7ec718ac7 100755
 +echo BloomPdfMaker.sh: LIB=$LIB, BASE=$BASE, SHARE=$SHARE, RUNMODE=$RUNMODE, MONO_PREFIX=$MONO_PREFIX
 +
 +exec "$MONO_PREFIX/bin/mono" --debug "$LIB/BloomPdfMaker.exe" "$@"
+diff --git a/src/BloomBrowserUI/teamCollection/TeamCollectionBookStatusPanel.tsx b/src/BloomBrowserUI/teamCollection/TeamCollectionBookStatusPanel.tsx
+index c6de062c6..2f4860b55 100644
+--- a/src/BloomBrowserUI/teamCollection/TeamCollectionBookStatusPanel.tsx
++++ b/src/BloomBrowserUI/teamCollection/TeamCollectionBookStatusPanel.tsx
+@@ -58,7 +58,7 @@ export const TeamCollectionBookStatusPanel: React.FunctionComponent<IBookTeamCol
+     const lockedByMe =
+         props.who !== "" &&
+         props.who === props.currentUser &&
+-        props.where === props.currentMachine;
++        props.where.toLowerCase() === props.currentMachine.toLowerCase();
+     const lockedByFullName = `${props.whoFirstName} ${props.whoSurname}`.trim();
+     const lockedByDisplay =
+         lockedByFullName !== "" ? lockedByFullName : props.who;
 diff --git a/src/BloomExe/FatalExceptionHandler.cs b/src/BloomExe/FatalExceptionHandler.cs
 index d1905d6eb..0e52b40da 100644
 --- a/src/BloomExe/FatalExceptionHandler.cs
@@ -48,7 +61,7 @@ index d1905d6eb..0e52b40da 100644
  			{
  				if (Program.RunningHarvesterMode)
 diff --git a/src/BloomExe/FontProcessing/FontMetadata.cs b/src/BloomExe/FontProcessing/FontMetadata.cs
-index cbe1c037b..b1f1b598b 100644
+index 836aad415..09b78092f 100644
 --- a/src/BloomExe/FontProcessing/FontMetadata.cs
 +++ b/src/BloomExe/FontProcessing/FontMetadata.cs
 @@ -43,8 +43,8 @@ public class FontMetadata
@@ -255,19 +268,6 @@ index 32e03335a..385942363 100644
  			}
  			if (!modifiedBook.IsTemplateBook)
  				modifiedBook.RemoveBlankPages(settings?.LanguagesToInclude);
-diff --git a/src/BloomExe/Publish/AudioProcessor.cs b/src/BloomExe/Publish/AudioProcessor.cs
-index ed079a29d..e6de0d40c 100644
---- a/src/BloomExe/Publish/AudioProcessor.cs
-+++ b/src/BloomExe/Publish/AudioProcessor.cs
-@@ -144,7 +144,7 @@ public static bool DoesAudioExistForSegment(string bookFolderPath, string record
- 		/// </summary>
- 		public static string MergeAudioFiles(IEnumerable<string> mergeFiles, string combinedAudioPath)
- 		{
--			var ffmpeg = "/usr/bin/ffmpeg"; // standard Linux location
-+			var ffmpeg = "/app/bin/ffmpeg"; // standard Linux location
- 			if (SIL.PlatformUtilities.Platform.IsWindows)
- 				ffmpeg = Path.Combine(BloomFileLocator.GetCodeBaseFolder(), "ffmpeg.exe");
- 			if (RobustFile.Exists(ffmpeg))
 diff --git a/src/BloomExe/Publish/BloomLibrary/BloomLibraryUploadControl.cs b/src/BloomExe/Publish/BloomLibrary/BloomLibraryUploadControl.cs
 index 1bcc66d43..adac0afdc 100644
 --- a/src/BloomExe/Publish/BloomLibrary/BloomLibraryUploadControl.cs
@@ -400,10 +400,10 @@ index 018dc97f8..09f7faebe 100644
  				string timeString = null;
  				if (!string.IsNullOrEmpty(output))
 diff --git a/src/BloomExe/web/controllers/AudioSegmentationApi.cs b/src/BloomExe/web/controllers/AudioSegmentationApi.cs
-index 32fda207a..eda12ba56 100644
+index d4ae7d9ac..2fe041ef4 100644
 --- a/src/BloomExe/web/controllers/AudioSegmentationApi.cs
 +++ b/src/BloomExe/web/controllers/AudioSegmentationApi.cs
-@@ -111,7 +111,9 @@ public bool AreAutoSegmentDependenciesMet(out string message)
+@@ -112,7 +112,9 @@ public bool AreAutoSegmentDependenciesMet(out string message)
  			string workingDir = Platform.IsLinux ? "/tmp" : kWorkingDirectory;
  			string stdout;
  			var findPythonCommand = $"{locateCmd} python";
@@ -414,7 +414,7 @@ index 32fda207a..eda12ba56 100644
  			{
  				// Ubuntu 20.04 installs python3 by default without any /usr/bin/python, and python3-aeneas is
  				// installed instead of python-aeneas (which depends on python2.7).
-@@ -433,11 +435,12 @@ private string GetBestSupportedLanguage(string requestedLangCode, out string std
+@@ -434,11 +436,12 @@ private string GetBestSupportedLanguage(string requestedLangCode, out string std
  
  				return "eo";
  			}
@@ -428,7 +428,7 @@ index 32fda207a..eda12ba56 100644
  			{
  				return requestedLangCode;
  			}
-@@ -469,7 +472,7 @@ private string GetBestSupportedLanguage(string requestedLangCode, out string std
+@@ -470,7 +473,7 @@ private string GetBestSupportedLanguage(string requestedLangCode, out string std
  			string langCode = null;
  			foreach (var langCodeToTry in potentialFallbackLangs)
  			{
