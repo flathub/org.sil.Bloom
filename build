@@ -16,6 +16,6 @@ flatpak-builder --user --repo=../flatpak/local-repo --keep-build-dirs --force-cl
 flatpak --user remote-add --no-gpg-verify --if-not-exists local-repo ../flatpak/local-repo
 # If a Bloom flatpak is already installed, such as from a downloaded
 # .flatpak file, remove it so we don't fail to install what we just built.
-flatpak remove --assumeyes org.sil.BloomBeta org.sil.BloomBeta.Debug org.sil.BloomBeta.Locale ||
+flatpak remove --assumeyes org.sil.Bloom org.sil.Bloom.Debug org.sil.Bloom.Locale ||
     echo "flatpak packages were not already installed."
-flatpak --user install --or-update --noninteractive local-repo org.sil.BloomBeta org.sil.BloomBeta.Debug
+flatpak --user install --or-update --noninteractive local-repo org.sil.Bloom org.sil.Bloom.Debug

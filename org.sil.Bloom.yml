@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-app-id: org.sil.BloomBeta
+app-id: org.sil.Bloom
 
 runtime: org.gnome.Platform
 # This appears to be the last runtime version that Bloom will run on.
@@ -49,9 +49,9 @@ finish-args:
     - --device=all
     # enable file saving
     - --system-talk-name=org.freedesktop.FileManager1
-rename-desktop-file: bloom-beta.desktop
-rename-appdata-file: bloom-beta.appdata.xml
-command: bloom-beta
+rename-desktop-file: bloom.desktop
+rename-appdata-file: bloom.appdata.xml
+command: bloom
 
 modules:
     - name: BloomDesktop
@@ -88,7 +88,7 @@ modules:
       sources:
           - type: git
             url: https://github.com/BloomBooks/BloomDesktop.git
-            commit: e0afde9272d94c713c0361ba7b89174a48108927
+            commit: aa3895ddcf588d6be39029f5ebb5a68d5d8cef4a
           # Bloom nuget dependencies
           # To regenerate bloom-build-sources-nuget.yml:
           #   ./compose-nuget-sources bloom-build-sources-nuget.yml nuget_packages ./extra/buildPackages.config

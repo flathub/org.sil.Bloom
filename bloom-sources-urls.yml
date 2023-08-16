@@ -11,7 +11,7 @@
   type: file
   url: https://build.palaso.org/guestAuth/repository/download/bt396/bloom-5.4.tcbuildtag/MSBuild.Community.Tasks.Targets
 - dest: DistFiles
-  sha512: 0c40179a6591fa3aa8b0818bc715acce42d7de3169f12fcfd268182e76ba5e90fbd6d1bc0ef6a82e943ab8933528aefb8f5c3c6c1824d3c03d98886bd3314b80
+  sha512: aed3d1e7bca8fde26faaf967d9777e0696214c7715145429d3d0f02279975020f6e39d685220e551be1e8721b80d81d6bb732a21f312923382b6c8240a04cd25
   type: file
   url: https://build.palaso.org/guestAuth/repository/download/Bloom_Help_BloomHelp54/latest.lastSuccessful/Bloom.chm
 - dest: Downloads
