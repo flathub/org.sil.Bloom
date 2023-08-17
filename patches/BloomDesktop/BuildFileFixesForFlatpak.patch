@@ -1,5 +1,5 @@
 diff --git a/Bloom.sln b/Bloom.sln
-index c920c20d3..2ffe81734 100644
+index c920c20d3..fd31af9df 100644
 --- a/Bloom.sln
 +++ b/Bloom.sln
 @@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.26430.14
@@ -11,7 +11,27 @@ index c920c20d3..2ffe81734 100644
  Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{04AF3A87-C943-4731-BE3D-659EA705171D}"
  EndProject
  Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DistFiles", "DistFiles", "{D38FC737-8C27-46CB-B490-3CB2E7AB3C99}"
-@@ -47,18 +45,6 @@ Global
+@@ -30,9 +28,11 @@ Global
+ 		Debug|Any CPU = Debug|Any CPU
+ 		Debug|Mixed Platforms = Debug|Mixed Platforms
+ 		Debug|x86 = Debug|x86
++		Debug|x64 = Debug|x64
+ 		Release|Any CPU = Release|Any CPU
+ 		Release|Mixed Platforms = Release|Mixed Platforms
+ 		Release|x86 = Release|x86
++		Release|x64 = Release|x64
+ 	EndGlobalSection
+ 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+ 		{304D5612-167C-4725-AF27-B9F2BB788B57}.Debug|Any CPU.ActiveCfg = Debug|x86
+@@ -41,24 +41,16 @@ Global
+ 		{304D5612-167C-4725-AF27-B9F2BB788B57}.Debug|Mixed Platforms.Build.0 = Debug|x86
+ 		{304D5612-167C-4725-AF27-B9F2BB788B57}.Debug|x86.ActiveCfg = Debug|x86
+ 		{304D5612-167C-4725-AF27-B9F2BB788B57}.Debug|x86.Build.0 = Debug|x86
++		{304D5612-167C-4725-AF27-B9F2BB788B57}.Debug|x64.ActiveCfg = Debug|x64
++		{304D5612-167C-4725-AF27-B9F2BB788B57}.Debug|x64.Build.0 = Debug|x64
+ 		{304D5612-167C-4725-AF27-B9F2BB788B57}.Release|Any CPU.ActiveCfg = Release|x86
+ 		{304D5612-167C-4725-AF27-B9F2BB788B57}.Release|Any CPU.Build.0 = Release|x86
+ 		{304D5612-167C-4725-AF27-B9F2BB788B57}.Release|Mixed Platforms.ActiveCfg = Release|x86
  		{304D5612-167C-4725-AF27-B9F2BB788B57}.Release|Mixed Platforms.Build.0 = Release|x86
  		{304D5612-167C-4725-AF27-B9F2BB788B57}.Release|x86.ActiveCfg = Release|x86
  		{304D5612-167C-4725-AF27-B9F2BB788B57}.Release|x86.Build.0 = Release|x86
@@ -27,11 +47,13 @@ index c920c20d3..2ffe81734 100644
 -		{57E7AC72-D901-4A80-A50B-71319AC96CDC}.Release|Mixed Platforms.Build.0 = Release|x86
 -		{57E7AC72-D901-4A80-A50B-71319AC96CDC}.Release|x86.ActiveCfg = Release|x86
 -		{57E7AC72-D901-4A80-A50B-71319AC96CDC}.Release|x86.Build.0 = Release|x86
++		{304D5612-167C-4725-AF27-B9F2BB788B57}.Release|x64.ActiveCfg = Release|x64
++		{304D5612-167C-4725-AF27-B9F2BB788B57}.Release|x64.Build.0 = Release|x64
  	EndGlobalSection
  	GlobalSection(SolutionProperties) = preSolution
  		HideSolutionNode = FALSE
 diff --git a/debian/bloom b/debian/bloom
-index 3e6be8764..2e6af4775 100755
+index 3a9b81d26..8af398548 100755
 --- a/debian/bloom
 +++ b/debian/bloom
 @@ -1,11 +1,21 @@
@@ -59,26 +81,8 @@ index 3e6be8764..2e6af4775 100755
 +# Without this sync, communication with BloomLibrary (or at least S3) will fail.
 +[ ! -d ~/.var/app/org.sil.Bloom/config/.mono/certs ] && /app/bin/mono /app/lib/mono/4.5/cert-sync.exe --user /app/share/ca-certificates/ca-certificates.crt
 +exec /app/bin/mono --debug "$LIB"/Bloom.exe "$@"
-diff --git a/debian/bloom.appdata.xml b/debian/bloom.appdata.xml
-index 831ad08a1..9e9de3843 100644
---- a/debian/bloom.appdata.xml
-+++ b/debian/bloom.appdata.xml
-@@ -38,8 +38,11 @@
-   <url type="bugtracker">https://issues.bloomlibrary.org/youtrack</url>
-   <url type="help">https://community.software.sil.org/c/bloom</url>
-   <releases>
--    <release version="5.3" date="2023-01-10">
--    </release>
-+    <release version="5.3.3" date="2023-05-11"></release>
-+    <release version="5.3.2" date="2023-02-10"></release>
-+    <release version="5.3.1" date="2023-01-11"></release>
-+    <release version="5.2.2" date="2022-11-29"></release>
-+    <release version="5.2.1" date="2022-07-07"></release>
-   </releases>
-   <content_rating type="oars-1.0"/>
- </component>
 diff --git a/environ b/environ
-index 44b1f73b2..1d560153b 100644
+index 44b1f73b2..1673c7b5f 100644
 --- a/environ
 +++ b/environ
 @@ -6,9 +6,9 @@
@@ -159,7 +163,7 @@ index 91b1fa261..808a03c23 100644
  else
    export XULRUNNER=$(dirname $(find ${tmpbasedir}/output/${BUILD} -name libxul.so))
 diff --git a/src/BloomBrowserUI/gulpfile.js b/src/BloomBrowserUI/gulpfile.js
-index 07bd54753..7a9e555f3 100644
+index 5084f87ed..b23ce38cf 100644
 --- a/src/BloomBrowserUI/gulpfile.js
 +++ b/src/BloomBrowserUI/gulpfile.js
 @@ -102,7 +102,9 @@ var paths = {
@@ -200,10 +204,10 @@ index 07bd54753..7a9e555f3 100644
                      cmd =
                          "..\\..\\lib\\dotnet\\HtmlXliff.exe --extract --preserve";
 diff --git a/src/BloomExe/BloomExe.csproj b/src/BloomExe/BloomExe.csproj
-index d8776bdb4..2547c5fd4 100644
+index 825169335..5feb0d7bc 100644
 --- a/src/BloomExe/BloomExe.csproj
 +++ b/src/BloomExe/BloomExe.csproj
-@@ -9,7 +9,7 @@
+@@ -10,7 +10,7 @@
      <TargetFrameworkProfile>
      </TargetFrameworkProfile>
      <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
@@ -212,16 +216,71 @@ index d8776bdb4..2547c5fd4 100644
      <PackagesConfig Condition="'$(OS)'=='Windows_NT'">$(MSBuildProjectDirectory)\packages.config</PackagesConfig>
      <PackagesConfig Condition="'$(OS)'!='Windows_NT'">$(MSBuildProjectDirectory)/Linux/packages.config</PackagesConfig>
      <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-@@ -175,7 +175,7 @@
+@@ -68,6 +68,54 @@
+   <PropertyGroup Condition="'$(OS)'!='Windows_NT' AND '$(Configuration)|$(Platform)' == 'Release|x86'">
+     <DefineConstants>__MonoCS__;TRACE</DefineConstants>
+   </PropertyGroup>
++  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
++    <DebugSymbols>true</DebugSymbols>
++    <OutputPath>..\..\output\Debug\</OutputPath>
++    <DefineConstants>DEBUG;TRACE</DefineConstants>
++    <DebugType>full</DebugType>
++    <PlatformTarget>x64</PlatformTarget>
++    <CodeAnalysisLogFile>..\..\output\Debug\Bloom.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
++    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
++    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
++    <ErrorReport>prompt</ErrorReport>
++    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
++    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
++    <CodeAnalysisIgnoreBuiltInRuleSets>false</CodeAnalysisIgnoreBuiltInRuleSets>
++    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
++    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
++    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
++    <WarningLevel>4</WarningLevel>
++    <Optimize>false</Optimize>
++    <Prefer32Bit>false</Prefer32Bit>
++    <LangVersion>7.3</LangVersion>
++  </PropertyGroup>
++  <PropertyGroup Condition="'$(OS)'!='Windows_NT' AND '$(Configuration)|$(Platform)' == 'Debug|x64'">
++    <DefineConstants>__MonoCS__;DEBUG;TRACE</DefineConstants>
++  </PropertyGroup>
++  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
++    <OutputPath>..\..\output\Release\</OutputPath>
++    <DebugType>pdbonly</DebugType>
++    <PlatformTarget>x64</PlatformTarget>
++    <CodeAnalysisLogFile>..\..\output\Release\Bloom.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
++    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
++    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
++    <ErrorReport>prompt</ErrorReport>
++    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
++    <CodeAnalysisRuleSetDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\\Rule Sets</CodeAnalysisRuleSetDirectories>
++    <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
++    <CodeAnalysisRuleDirectories>;C:\Program Files (x86)\Microsoft Visual Studio 10.0\Team Tools\Static Analysis Tools\FxCop\\Rules</CodeAnalysisRuleDirectories>
++    <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
++    <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
++    <WarningLevel>4</WarningLevel>
++    <Optimize>false</Optimize>
++    <DebugSymbols>true</DebugSymbols>
++    <DefineConstants>TRACE</DefineConstants>
++    <Prefer32Bit>false</Prefer32Bit>
++    <LangVersion>7.3</LangVersion>
++  </PropertyGroup>
++  <PropertyGroup Condition="'$(OS)'!='Windows_NT' AND '$(Configuration)|$(Platform)' == 'Release|x64'">
++    <DefineConstants>__MonoCS__;TRACE</DefineConstants>
++  </PropertyGroup>
+   <PropertyGroup>
+     <OutputType>WinExe</OutputType>
+   </PropertyGroup>
+@@ -185,7 +233,7 @@
      </Reference>
      <Reference Include="MarkdownDeep, Version=1.5.4615.26275, Culture=neutral, processorArchitecture=MSIL">
        <SpecificVersion>False</SpecificVersion>
 -      <HintPath>..\..\packages\MarkdownDeep.NET.1.5\lib\.NetFramework 3.5\MarkdownDeep.dll</HintPath>
 +      <HintPath>..\..\packages\MarkdownDeep.NET.1.5.0\lib\.NetFramework 3.5\MarkdownDeep.dll</HintPath>
      </Reference>
-     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=5.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-       <HintPath>..\..\packages\Microsoft.Bcl.AsyncInterfaces.5.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
-@@ -218,7 +218,7 @@
+     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=7.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+       <HintPath>..\..\packages\Microsoft.Bcl.AsyncInterfaces.7.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+@@ -240,7 +288,7 @@
      <Reference Include="PdfSharp">
        <HintPath>..\..\lib\dotnet\PdfSharp.dll</HintPath>
      </Reference>
@@ -230,7 +289,7 @@ index d8776bdb4..2547c5fd4 100644
        <HintPath>..\..\lib\dotnet\PodcastUtilities.PortableDevices.dll</HintPath>
      </Reference>
      <Reference Include="PresentationCore" />
-@@ -264,7 +264,7 @@
+@@ -286,7 +334,7 @@
      <Reference Include="Spart, Version=1.0.0.0, Culture=neutral, PublicKeyToken=14d24e064e474331, processorArchitecture=MSIL">
        <HintPath>..\..\packages\Spart.1.0.0\lib\net461\Spart.dll</HintPath>
      </Reference>
@@ -239,7 +298,7 @@ index d8776bdb4..2547c5fd4 100644
        <HintPath>..\..\lib\dotnet\Splat.dll</HintPath>
      </Reference>
      <Reference Include="SQLite-net, Version=1.7.335.0, Culture=neutral, processorArchitecture=MSIL">
-@@ -286,6 +286,9 @@
+@@ -308,6 +356,9 @@
        <HintPath>..\..\lib\dotnet\Squirrel.dll</HintPath>
      </Reference>
      <Reference Include="System" />
@@ -249,19 +308,19 @@ index d8776bdb4..2547c5fd4 100644
      <Reference Include="System.Collections.Immutable, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
        <HintPath>..\..\packages\System.Collections.Immutable.5.0.0\lib\net461\System.Collections.Immutable.dll</HintPath>
      </Reference>
-@@ -304,6 +307,9 @@
-       <HintPath>..\..\packages\System.Drawing.Common.6.0.0\lib\net461\System.Drawing.Common.dll</HintPath>
+@@ -330,6 +381,9 @@
+       <Private>True</Private>
      </Reference>
      <Reference Include="System.IO.Compression.FileSystem" />
 +    <Reference Include="System.IO.FileSystem, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
 +      <HintPath>..\..\packages\System.IO.FileSystem.4.3.0\lib\net46\System.IO.FileSystem.dll</HintPath>
 +    </Reference>
-     <Reference Include="System.IO.FileSystem.AccessControl, Version=4.0.5.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-       <HintPath>..\..\packages\System.IO.FileSystem.AccessControl.4.7.0\lib\net461\System.IO.FileSystem.AccessControl.dll</HintPath>
+     <Reference Include="System.IO.FileSystem.AccessControl, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\..\packages\System.IO.FileSystem.AccessControl.5.0.0\lib\net461\System.IO.FileSystem.AccessControl.dll</HintPath>
      </Reference>
-@@ -320,6 +326,9 @@
-     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-       <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+@@ -358,6 +412,9 @@
+     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+       <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
      </Reference>
 +    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
 +      <HintPath>..\..\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
@@ -269,7 +328,7 @@ index d8776bdb4..2547c5fd4 100644
      <Reference Include="System.Runtime.Serialization" />
      <Reference Include="System.Numerics.Vectors">
        <HintPath>..\..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-@@ -344,9 +353,10 @@
+@@ -382,9 +439,10 @@
      </Reference>
      <Reference Include="System.Threading.Tasks, Version=4.0.11.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
      <Reference Include="System.Transactions" />
@@ -283,19 +342,19 @@ index d8776bdb4..2547c5fd4 100644
      <Reference Include="System.Web.Extensions" />
      <Reference Include="System.Xml.Linq" />
 diff --git a/src/BloomExe/Linux/packages.config b/src/BloomExe/Linux/packages.config
-index c7759ecdd..bd11e88af 100644
+index 4c83705be..daf7103bd 100644
 --- a/src/BloomExe/Linux/packages.config
 +++ b/src/BloomExe/Linux/packages.config
-@@ -24,7 +24,7 @@
+@@ -27,7 +27,7 @@
    <package id="JsonFx" version="2.0.1209.2802" targetFramework="net461" />
-   <package id="L10NSharp" version="5.0.0-beta0088" targetFramework="net472" />
-   <package id="Markdig.Signed" version="0.22.0" targetFramework="net461" />
+   <package id="L10NSharp" version="6.0.0" targetFramework="net472" />
+   <package id="Markdig.Signed" version="0.30.4" targetFramework="net472" />
 -  <package id="MarkdownDeep.NET" version="1.5" targetFramework="net40-Client" />
 +  <package id="MarkdownDeep.NET" version="1.5.0" targetFramework="net40-Client" />
-   <package id="Microsoft.Bcl.AsyncInterfaces" version="5.0.0" targetFramework="net461" />
+   <package id="Microsoft.Bcl.AsyncInterfaces" version="7.0.0" targetFramework="net472" />
+   <package id="Microsoft.CSharp" version="4.7.0" targetFramework="net472" />
    <package id="Microsoft.DotNet.PlatformAbstractions" version="3.1.6" targetFramework="net461" />
-   <package id="Microsoft.Extensions.DependencyModel" version="3.1.6" targetFramework="net461" />
-@@ -77,4 +77,7 @@
+@@ -89,4 +89,7 @@
    <!-- Linux specific packages.  Changes above this line must be copied to ../packages.config -->
    <package id="Geckofx60.64.Linux" version="60.0.51" targetFramework="net461" />
    <package id="SharpFont" version="3.1.0" targetFramework="net461" />
@@ -303,3 +362,35 @@ index c7759ecdd..bd11e88af 100644
 +  <package id="System.IO.FileSystem" version="4.3.0" targetFramework="net461" />
 +  <package id="System.Threading.Tasks.Extensions" version="4.5.4" targetFramework="net461" />
  </packages>
+diff --git a/src/content/package.json b/src/content/package.json
+index c8f9a169a..fbd090805 100644
+--- a/src/content/package.json
++++ b/src/content/package.json
+@@ -48,7 +48,7 @@
+     },
+     "license": "MIT",
+     "dependencies": {
+-        "@types/node": "^18.6.3",
++        "@types/node": "16.18.0",
+         "typescript": "^4.6.3"
+     },
+     "packageManager": "yarn@1.22.19",
+diff --git a/src/content/yarn.lock b/src/content/yarn.lock
+index 1172b6085..8b59fdcec 100644
+--- a/src/content/yarn.lock
++++ b/src/content/yarn.lock
+@@ -87,10 +87,10 @@
+   dependencies:
+     "@types/babel-types" "*"
+ 
+-"@types/node@^18.6.3":
+-  version "18.6.3"
+-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.6.3.tgz#4e4a95b6fe44014563ceb514b2598b3e623d1c98"
+-  integrity sha512-6qKpDtoaYLM+5+AFChLhHermMQxc3TOEFIDzrZLPRGHPrLEwqFkkT5Kx3ju05g6X7uDPazz3jHbKPX0KzCjntg==
++"@types/node@16.18.0":
++  version "16.18.0"
++  resolved "https://registry.npmjs.org/@types/node/-/node-16.18.0.tgz#34982c6d5b5734c900f4ee69e1b87d212db6c60f"
++  integrity sha512-LqYqYzYvnbCaQfLAwRt0zboqnsViwhZm+vjaMSqcfN36vulAg7Pt0T83q4WZO2YOBw3XdyHi8cQ88H22zmULOA==
+ 
+ acorn-globals@^3.0.0:
+   version "3.1.0"

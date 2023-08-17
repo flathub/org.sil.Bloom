@@ -1,56 +1,56 @@
 - dest: DistFiles
   sha512: df40ff43336292504ef6d2f3a8e16673b8fa3502165cc27889d3896d85d95825dff0dea48d69b446f90ffb9a984b53f54c142432138bbc6b8d097fd930d0d344
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/bt396/bloom-5.3.tcbuildtag/connections.dll
+  url: https://build.palaso.org/guestAuth/repository/download/bt396/bloom-5.4.tcbuildtag/connections.dll
 - dest: build
   sha512: dc29560d4d085686858dcb8ef3dc34273cf88e9a0310810c0c74cf4e5acd8e0a01dcf8f9562d56136edbf1316987ece9e5735ed5cd4157762843e77d6c28ce0e
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/bt396/bloom-5.3.tcbuildtag/MSBuild.Community.Tasks.dll
+  url: https://build.palaso.org/guestAuth/repository/download/bt396/bloom-5.4.tcbuildtag/MSBuild.Community.Tasks.dll
 - dest: build
   sha512: 16b72be6106a1422fece169d6de741cf2b106fec50173070a53d21f688cbaceec565439d2b6e2400e9b6182e943432dd54c03febf4ef3aab3355771b81bef7a2
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/bt396/bloom-5.3.tcbuildtag/MSBuild.Community.Tasks.Targets
+  url: https://build.palaso.org/guestAuth/repository/download/bt396/bloom-5.4.tcbuildtag/MSBuild.Community.Tasks.Targets
 - dest: DistFiles
-  sha512: 1fa4d4822b81e6dc874fd163465e32b04e45c86b57895b61675a93e5ab568fea6b5489602d27f36ef44c4ffd94df9041d1ca3cd7b460ff467f46e59a5b738718
+  sha512: aed3d1e7bca8fde26faaf967d9777e0696214c7715145429d3d0f02279975020f6e39d685220e551be1e8721b80d81d6bb732a21f312923382b6c8240a04cd25
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/Bloom_Help_BloomHelp53/latest.lastSuccessful/Bloom.chm
+  url: https://build.palaso.org/guestAuth/repository/download/Bloom_Help_BloomHelp54/latest.lastSuccessful/Bloom.chm
 - dest: Downloads
   sha512: 278a56b9feaa3a1ffaf9c0da7f9854707967feaf5c13560c1777e29f1c4198f6edeaebacc0d3701336ece2605cfd32702356239de02bd18c50e8357365235bdc
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/bt401/bloom-5.3.tcbuildtag/pdfjs-viewer.zip
+  url: https://build.palaso.org/guestAuth/repository/download/bt401/bloom-5.4.tcbuildtag/pdfjs-viewer.zip
 - dest: lib/dotnet
   sha512: bd68d0ba9b672e5eed5c17ea898766cf1606233975c75e414f804ee6a4e8b6ac2485aa6fd23f4617b1c5a66ae4461309725d195b78473c4bafd34487e89907ee
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/GeckofxHtmlToPdf_GeckofxHtmlToPdfXenial64continuous/bloom-5.3.tcbuildtag/Args.dll
+  url: https://build.palaso.org/guestAuth/repository/download/GeckofxHtmlToPdf_GeckofxHtmlToPdfXenial64continuous/bloom-5.4.tcbuildtag/Args.dll
 - dest: lib/dotnet
-  sha512: 4fe9a30085be1863dae2f907581542c8de869d8a01c2a7a9af4ff1d96a4cb64b5ec3f2c8023384e0efd349073eb86f8ee62cc0f4ff36ce3d594ce8ac5fcc927c
+  sha512: 9e4fabd3ee6bbc44653a34f63cdc15763a1abe5e3ff50b15e52fdd4554e000aecdec23548c9b8c23a131104e0a37b0cd8e05d80cbb1edf2989a39d575026b5ac
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/GeckofxHtmlToPdf_GeckofxHtmlToPdfXenial64continuous/bloom-5.3.tcbuildtag/GeckofxHtmlToPdf.exe
+  url: https://build.palaso.org/guestAuth/repository/download/GeckofxHtmlToPdf_GeckofxHtmlToPdfXenial64continuous/bloom-5.4.tcbuildtag/GeckofxHtmlToPdf.exe
 - dest: lib/dotnet
   sha512: bb7915678d7f6e77e1d508812c46f2c09090325e862466e784a9fee9cd9826ef2e68edb8b7f6ba2409c59dfa9100ed1cb22b4d692155253c502ade98eba57322
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/GeckofxHtmlToPdf_GeckofxHtmlToPdfXenial64continuous/bloom-5.3.tcbuildtag/GeckofxHtmlToPdf.exe.config
+  url: https://build.palaso.org/guestAuth/repository/download/GeckofxHtmlToPdf_GeckofxHtmlToPdfXenial64continuous/bloom-5.4.tcbuildtag/GeckofxHtmlToPdf.exe.config
 - dest: lib/dotnet
-  sha512: b14cebcaad43383529190d66c1a5202fe8e9f52e3304d53e92804a1d1fbf9a5a440e754ea78c1f4d361a47e0488d64ea98545d140cbfdbe491ee02969ec49a20
+  sha512: 6dcd1f69623ec80185b0250fca199856ee6e727a6e1f476cc7718ca90ba68db60570b6e8bc3d586598388cf1b60b58243d371ce1b82d86e2af7085f8749c5d41
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/bt344/bloom-5.3.tcbuildtag/PdfDroplet.exe
+  url: https://build.palaso.org/guestAuth/repository/download/bt344/bloom-5.4.tcbuildtag/PdfDroplet.exe
 - dest: lib/dotnet
   sha512: bdaf9f6ea7f9646619b188a7fbcd16707128cd3786f232785e92964fe579044bd6be1bff834ee2a036d0281bd395843c684ae94242a9a153e543807b68c1677d
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/bt344/bloom-5.3.tcbuildtag/PdfSharp.dll
+  url: https://build.palaso.org/guestAuth/repository/download/bt344/bloom-5.4.tcbuildtag/PdfSharp.dll
 - dest: lib/dotnet
   sha512: 777b570097e070e188e3ea49c7baa207d8be65ae834adef5157462d135c67d52ef7b9879ce4a5e7bc34525ad2ad4e3feedeb5d9bc92e0870c108ef2776a1da98
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/bt351/bloom-5.3.tcbuildtag/TidyManaged.dll
+  url: https://build.palaso.org/guestAuth/repository/download/bt351/bloom-5.4.tcbuildtag/TidyManaged.dll
 - dest: lib/dotnet
   sha512: 58eb7b0865a0c4210f9fcd3b14673e5ef9fbd5b27ff83ac6d0c53155ab7350e77bb4cf8c9acd087d9777479c6dc52431ed61c6494af6848e17a2550d30746851
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/bt351/bloom-5.3.tcbuildtag/TidyManaged.dll.config
+  url: https://build.palaso.org/guestAuth/repository/download/bt351/bloom-5.4.tcbuildtag/TidyManaged.dll.config
 - dest: lib/dotnet
   sha512: 5a0a4ceb087ba07c7f9fcc576d6bb36d10512c7e4a4797d2d462051258224c36d0a83cdb1422247d6089a894fe673a3bbe4fc4240c8dc8ef92040926136f7541
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/XliffForHtml_LinuxMasterContinuous/bloom-5.3.tcbuildtag/HtmlXliff.exe
+  url: https://build.palaso.org/guestAuth/repository/download/XliffForHtml_LinuxMasterContinuous/bloom-5.4.tcbuildtag/HtmlXliff.exe
 - dest: lib/dotnet
   sha512: ee56bb9c1cf7f75b11f2361bfd12221f9bec2b80ab596514dfdd5675ed3785e28612b4b7ad3b356f54079f2d4ee3116afd36be07d1340d8032db7aa6aeafbc29
   type: file
-  url: https://build.palaso.org/guestAuth/repository/download/XliffForHtml_LinuxMasterContinuous/bloom-5.3.tcbuildtag/HtmlAgilityPack.dll
+  url: https://build.palaso.org/guestAuth/repository/download/XliffForHtml_LinuxMasterContinuous/bloom-5.4.tcbuildtag/HtmlAgilityPack.dll
