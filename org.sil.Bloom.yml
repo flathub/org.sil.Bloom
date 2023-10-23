@@ -24,106 +24,106 @@ app-id: org.sil.Bloom
 
 runtime: org.gnome.Platform
 # This appears to be the last runtime version that Bloom will run on.
-runtime-version: "42"
+runtime-version: '42'
 sdk: org.gnome.Sdk
 sdk-extensions:
-    - org.freedesktop.Sdk.Extension.node16
-    - org.freedesktop.Sdk.Extension.mono6
+  - org.freedesktop.Sdk.Extension.node16
+  - org.freedesktop.Sdk.Extension.mono6
 writable-sdk: true # Required to install msbuild for building libpalaso and geckofx
 
 finish-args:
-    - --socket=x11
-    - --share=ipc
-    - --share=network
-    - --socket=pulseaudio
+  - --socket=x11
+  - --share=ipc
+  - --share=network
+  - --socket=pulseaudio
     # Bloom can import books and share folders over networks (either local or
     # via a mechanism like DropBox).  Users need to load pictures, sound files,
     # and videos from arbitrary locations in the filesystem. Users also need to
     # be able to export books in various formats to arbitrary locations.
-    - --filesystem=host
+  - --filesystem=host
     # Bloom writes temporary folders and files to /tmp, to open in a browser to
     # show the user, such as creating PDFs, ePUBs, or BloomPub ebooks.  Use the
     # same /tmp as the host, so the host programs can find the files.
-    - --filesystem=/tmp
+  - --filesystem=/tmp
     # webcam apparently needs this
-    - --device=all
+  - --device=all
     # enable file saving
-    - --system-talk-name=org.freedesktop.FileManager1
+  - --system-talk-name=org.freedesktop.FileManager1
 rename-desktop-file: bloom.desktop
 rename-appdata-file: bloom.appdata.xml
 command: bloom
 
 modules:
-    - name: BloomDesktop
-      buildsystem: simple
-      build-options:
-          append-path: /usr/lib/sdk/node16/bin
-          env:
-              MONO_PREFIX: "/app"
-              MONO_SILPKGDIR: "/app"
-              NUGET_SRC: "nuget_packages"
-              NUGET_DEST: "packages"
-              INSTALLATION_PREFIX: "/app"
-              RUNMODE: "PACKAGING"
-              XDG_CACHE_HOME: /run/build/flatpak-node/cache
-              BLOOMLIB: "/app/lib/bloom-desktop"
-              BLOOMSHARE: "/app/share/bloom-desktop"
-              PREFIX: "/app"
-              PERL5LIB: "/app/perl-modules/lib/perl5"
-              BUILD_CONFIG: "Release"
-      build-commands:
-          - |
-              set -xueo pipefail
-              yarn config set yarn-offline-mirror ${FLATPAK_BUILDER_BUILDDIR}/flatpak-node/yarn-mirror
-              cp local-extra/Makefile .
-              export NODE_OPTIONS=--max-old-space-size=1536
-              if [ -f local-extra/build_number.env ]; then . local-extra/build_number.env; else export FULL_BUILD_NUMBER=5.5.1.0; fi
-              make -B build
-              make -B install
+  - name: BloomDesktop
+    buildsystem: simple
+    build-options:
+      append-path: /usr/lib/sdk/node16/bin
+      env:
+        MONO_PREFIX: /app
+        MONO_SILPKGDIR: /app
+        NUGET_SRC: nuget_packages
+        NUGET_DEST: packages
+        INSTALLATION_PREFIX: /app
+        RUNMODE: PACKAGING
+        XDG_CACHE_HOME: /run/build/flatpak-node/cache
+        BLOOMLIB: /app/lib/bloom-desktop
+        BLOOMSHARE: /app/share/bloom-desktop
+        PREFIX: /app
+        PERL5LIB: /app/perl-modules/lib/perl5
+        BUILD_CONFIG: Release
+    build-commands:
+      - |
+        set -xueo pipefail
+        yarn config set yarn-offline-mirror ${FLATPAK_BUILDER_BUILDDIR}/flatpak-node/yarn-mirror
+        cp local-extra/Makefile .
+        export NODE_OPTIONS=--max-old-space-size=1536
+        if [ -f local-extra/build_number.env ]; then . local-extra/build_number.env; else export FULL_BUILD_NUMBER=5.5.1.0; fi
+        make -B build
+        make -B install
 
-      cleanup:
-          - "/include"
-          - "/lib/*/include"
-          - "*.a"
-      sources:
-          - type: git
-            url: https://github.com/BloomBooks/BloomDesktop.git
-            commit: aa3895ddcf588d6be39029f5ebb5a68d5d8cef4a
+    cleanup:
+      - /include
+      - /lib/*/include
+      - '*.a'
+    sources:
+      - type: git
+        url: https://github.com/BloomBooks/BloomDesktop.git
+        commit: aa3895ddcf588d6be39029f5ebb5a68d5d8cef4a
           # Bloom nuget dependencies
           # To regenerate bloom-build-sources-nuget.yml:
           #   ./compose-nuget-sources bloom-build-sources-nuget.yml nuget_packages ./extra/buildPackages.config
-          - bloom-build-nuget-sources.yml
+      - bloom-build-nuget-sources.yml
           # To regenerate bloom-sources-nuget.yml:
           #   ./compose-nuget-sources bloom-sources-nuget.yml nuget_packages ../BloomDesktop/src/BloomExe/Linux/packages.config
           # (but first, you have to apply a patch to get the right version on MarkdownDeep
           # and to pick up two System.* files from BloomTests.)
-          - bloom-sources-nuget.yml
-          - type: shell
+      - bloom-sources-nuget.yml
+      - type: shell
             # Extract nuget packages. The 'type: archive', 'archive-type: zip' had
             # some trouble working, so manually extract.
-            commands:
-                - |
-                    set -xueo pipefail
-                    for package in ${NUGET_SRC}/*.nupkg; do
-                      mkdir -p "${NUGET_DEST}/$(basename "${package}" .nupkg)" &&
-                        unzip "${package}" \
-                          -d "${NUGET_DEST}/$(basename "${package}" .nupkg)"
-                    done
-                    # repair damaged nupkgs
-                    mv "${NUGET_DEST}/MarkdownDeep.NET.1.5.0/lib/.NetFramework%203.5" "${NUGET_DEST}/MarkdownDeep.NET.1.5.0/lib/.NetFramework 3.5"
-                    chmod 755 "${NUGET_DEST}"/sqlite-net-pcl.1.7.335/*.*
-                    chmod 755 "${NUGET_DEST}"/sqlite-net-pcl.1.7.335/lib/netstandard2.0/SQLite-net.*
-                    chmod 755 "${NUGET_DEST}"/L10NSharp.6.0.0/lib/net461/L10NSharp.*
-                    # copy artifacts from internal geckofx builds to where the nuget packages have been installed.
-                    # (we need some things the nuget package includes, but want to replace the actual assemblies and add debug info)
-                    rm "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/Geckofx-*.dll.mdb
-                    cp --verbose --force /app/geckofx/Geckofx-Core.dll "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
-                    cp --verbose --force /app/geckofx/Geckofx-Core.dll.config "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
-                    cp --verbose --force /app/geckofx/Geckofx-Core.pdb "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
-                    cp --verbose --force /app/geckofx/Geckofx-Winforms.dll "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
-                    cp --verbose --force /app/geckofx/Geckofx-Winforms.dll.config "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
-                    cp --verbose --force /app/geckofx/Geckofx-Winforms.pdb "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
-                    rm -rf /app/geckofx
+        commands:
+          - |
+            set -xueo pipefail
+            for package in ${NUGET_SRC}/*.nupkg; do
+              mkdir -p "${NUGET_DEST}/$(basename "${package}" .nupkg)" &&
+                unzip "${package}" \
+                  -d "${NUGET_DEST}/$(basename "${package}" .nupkg)"
+            done
+            # repair damaged nupkgs
+            mv "${NUGET_DEST}/MarkdownDeep.NET.1.5.0/lib/.NetFramework%203.5" "${NUGET_DEST}/MarkdownDeep.NET.1.5.0/lib/.NetFramework 3.5"
+            chmod 755 "${NUGET_DEST}"/sqlite-net-pcl.1.7.335/*.*
+            chmod 755 "${NUGET_DEST}"/sqlite-net-pcl.1.7.335/lib/netstandard2.0/SQLite-net.*
+            chmod 755 "${NUGET_DEST}"/L10NSharp.6.0.0/lib/net461/L10NSharp.*
+            # copy artifacts from internal geckofx builds to where the nuget packages have been installed.
+            # (we need some things the nuget package includes, but want to replace the actual assemblies and add debug info)
+            rm "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/Geckofx-*.dll.mdb
+            cp --verbose --force /app/geckofx/Geckofx-Core.dll "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
+            cp --verbose --force /app/geckofx/Geckofx-Core.dll.config "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
+            cp --verbose --force /app/geckofx/Geckofx-Core.pdb "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
+            cp --verbose --force /app/geckofx/Geckofx-Winforms.dll "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
+            cp --verbose --force /app/geckofx/Geckofx-Winforms.dll.config "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
+            cp --verbose --force /app/geckofx/Geckofx-Winforms.pdb "${NUGET_DEST}"/Geckofx60.64.Linux.60.0.51/lib/net40/
+            rm -rf /app/geckofx
 
 
           # Bloom dependencies
@@ -132,492 +132,492 @@ modules:
           # Manually apply changes by editing bloom-sources-urls-input.yml.
           # regenerate input sources:
           #   ./compose-url-sources bloom-sources-urls-input.yml bloom-sources-urls.yml
-          - bloom-sources-urls.yml
-          - type: shell
+      - bloom-sources-urls.yml
+      - type: shell
             # Extract files from pdf.js zipfile.
-            commands:
-                - |
-                    set -xueo pipefail
-                    pwd
-                    mkdir -p "DistFiles/pdf" && unzip -uqo Downloads/pdfjs-viewer.zip -d "DistFiles/pdf"
+        commands:
+          - |
+            set -xueo pipefail
+            pwd
+            mkdir -p "DistFiles/pdf" && unzip -uqo Downloads/pdfjs-viewer.zip -d "DistFiles/pdf"
           # regenerate with this command:
           # flatpak-node-generator -o bloom-sources-browser-node.json yarn .../src/BloomBrowserUI/yarn.lock
-          - bloom-sources-browser-node.json
+      - bloom-sources-browser-node.json
           # regenerate with this command:
           # flatpak-node-generator -o bloom-sources-content-node.json yarn .../src/content/yarn.lock
-          - bloom-sources-content-node.json
-          - type: patch
-            path: patches/BloomDesktop/BuildFileFixesForFlatpak.patch
-          - type: patch
-            path: patches/BloomDesktop/CodeFixesForFlatpak.patch
-          - type: dir
-            path: ./extra
-            dest: local-extra
-          - type: file
-            url: https://dist.nuget.org/win-x86-commandline/v6.2.1/nuget.exe
-            sha256: a79f342e739fdb3903a92218767e7813e04930dff463621b6d2be2d468b84e05
-            dest: .nuget
-      modules:
+      - bloom-sources-content-node.json
+      - type: patch
+        path: patches/BloomDesktop/BuildFileFixesForFlatpak.patch
+      - type: patch
+        path: patches/BloomDesktop/CodeFixesForFlatpak.patch
+      - type: dir
+        path: ./extra
+        dest: local-extra
+      - type: file
+        url: https://dist.nuget.org/win-x86-commandline/v6.2.1/nuget.exe
+        sha256: a79f342e739fdb3903a92218767e7813e04930dff463621b6d2be2d468b84e05
+        dest: .nuget
+    modules:
           # python2.7 is needed for mono5-sil
-          - shared-modules/python2.7/python-2.7.json
-          - name: mono5-sil
-            config-opts:
+      - shared-modules/python2.7/python-2.7.json
+      - name: mono5-sil
+        config-opts:
                 # Build successfully with gcc >9.
-                - --enable-minimal=aot
-            cleanup:
-                - "/include"
-                - "*.a"
-                - "/bin/gtk-demo"
-                - "/bin/monodis"
-                - "/bin/monograph"
-                - "/bin/pedump"
-                - "/lib/mono/2*"
-                - "/lib/mono/3*"
-                - "/lib/mono/4.5/dim"
-                - "/lib/mono/4.5/Microsoft.CodeAnalysis.*"
-                - "/lib/mono/gac/Microsoft.Build.Engine"
-                - "/lib/mono/gac/Microsoft.Build"
-                - "/lib/mono/gac/monodoc"
-                - "/lib/mono/msbuild"
-                - "/lib/mono/xbuild-frameworks"
-                - "/lib/mono/xbuild"
-                - "/lib/monodoc"
-            sources:
-                - type: git
-                  url: https://github.com/sillsdev/mono.git
+          - --enable-minimal=aot
+        cleanup:
+          - /include
+          - '*.a'
+          - /bin/gtk-demo
+          - /bin/monodis
+          - /bin/monograph
+          - /bin/pedump
+          - /lib/mono/2*
+          - /lib/mono/3*
+          - /lib/mono/4.5/dim
+          - /lib/mono/4.5/Microsoft.CodeAnalysis.*
+          - /lib/mono/gac/Microsoft.Build.Engine
+          - /lib/mono/gac/Microsoft.Build
+          - /lib/mono/gac/monodoc
+          - /lib/mono/msbuild
+          - /lib/mono/xbuild-frameworks
+          - /lib/mono/xbuild
+          - /lib/monodoc
+        sources:
+          - type: git
+            url: https://github.com/sillsdev/mono.git
                   # Past sil/5.16.0.179
-                  commit: 2672d16f8b3006a574a0108b6c324d7a090678b5
-                - type: archive
+            commit: 2672d16f8b3006a574a0108b6c324d7a090678b5
+          - type: archive
                   # Update URL by doing: cd .../path/to/mono-repo && .../determine-monolite-url
-                  url: https://download.mono-project.com/monolite/monolite-linux-1051600011-latest.tar.gz
-                  sha512: b48bb273f5a9107f9bb9795d47277aeaaeb458588a6e011676bb9a152b83759f305cf1031a5e74a62145854ef17026cb1aa20ea9adb5e6b15f275b9d6af585db
-                  dest: mcs/class/lib/monolite-linux/1051600011
-                - type: patch
+            url: https://download.mono-project.com/monolite/monolite-linux-1051600011-latest.tar.gz
+            sha512: b48bb273f5a9107f9bb9795d47277aeaaeb458588a6e011676bb9a152b83759f305cf1031a5e74a62145854ef17026cb1aa20ea9adb5e6b15f275b9d6af585db
+            dest: mcs/class/lib/monolite-linux/1051600011
+          - type: patch
                   # mono uses a hard-coded path to ping. Help it find ping in /app.
-                  path: patches/mono/mono-ping-path.patch
-          - name: gtk-sharp3
-            sources:
-                - type: git
-                  url: "https://github.com/mono/gtk-sharp.git"
-                  commit: 9ef7d3f394b9d485674c59e92db24ac66fd9f16b
-                - type: patch
+            path: patches/mono/mono-ping-path.patch
+      - name: gtk-sharp3
+        sources:
+          - type: git
+            url: https://github.com/mono/gtk-sharp.git
+            commit: 9ef7d3f394b9d485674c59e92db24ac66fd9f16b
+          - type: patch
                   #https://github.com/scx/org.gnome.gbrainy/blob/ed2883a89cfd996c8e1e2a83ff23586c8971a0b6/gtk-sharp-profiler-startup.patch
-                  path: patches/gtk-sharp3/gtk-sharp-profiler-startup.patch
-          - name: mono5-sil-msbuild
+            path: patches/gtk-sharp3/gtk-sharp-profiler-startup.patch
+      - name: mono5-sil-msbuild
             # It was challenging to build msbuild from source. Other projects
             # appear to fetch binaries rather than build msbuild. Following that.
-            buildsystem: simple
-            build-commands:
+        buildsystem: simple
+        build-commands:
                 # Extract opt/mono5-sil/* into /app/
-                - |
-                    for package in *.deb; do
-                      mkdir "${package}-dir" &&
-                        (cd "${package}-dir" && ar x ../"${package}") &&
-                        tar -C /app -x -f "${package}-dir"/data.tar.xz \
-                          --strip-components=3 ./opt/mono5-sil
-                    done
+          - |
+            for package in *.deb; do
+              mkdir "${package}-dir" &&
+                (cd "${package}-dir" && ar x ../"${package}") &&
+                tar -C /app -x -f "${package}-dir"/data.tar.xz \
+                  --strip-components=3 ./opt/mono5-sil
+            done
                 # Use same-character-count path to /app since some binary files are
                 # going to be modified too.
-                - perl -pi -e 's#/opt/mono5-sil#/./././././app#g' /app/bin/*
-            cleanup:
+          - perl -pi -e 's#/opt/mono5-sil#/./././././app#g' /app/bin/*
+        cleanup:
                 # Can't clean '*' because that seems to result in /app/bin/mono being
                 # absent.
-                - "/lib/mono/msbuild"
-                - "/lib/mono/xbuild"
-            sources:
-                - type: file
-                  url: http://linux.lsdev.sil.org/ubuntu/pool/main/m/mono5-sil-msbuild/mono5-sil-msbuild_15.8+xamarinxplat.2018.07.31.22.43-0xamarin5+ubuntu1804b1_all.deb
-                  sha256: 758274d8bc438f325fc5fc808c0482ab50eb2bdaf02f61747888e190760753de
+          - /lib/mono/msbuild
+          - /lib/mono/xbuild
+        sources:
+          - type: file
+            url: http://linux.lsdev.sil.org/ubuntu/pool/main/m/mono5-sil-msbuild/mono5-sil-msbuild_15.8+xamarinxplat.2018.07.31.22.43-0xamarin5+ubuntu1804b1_all.deb
+            sha256: 758274d8bc438f325fc5fc808c0482ab50eb2bdaf02f61747888e190760753de
           # giflib is needed for libgdiplus
-          - name: giflib
+      - name: giflib
             # Note that for some reason, giflib won't build with the autotools buildsystem.
             # The build stops with error
             #   /run/build/giflib/missing: line 81: aclocal-1.15: command not found
             # This happens whether or not the perl command is applied to modify configure.ac.
-            buildsystem: simple
-            build-commands:
+        buildsystem: simple
+        build-commands:
                 # Skip building documentation
-                - perl -pi -e 's#doc/Makefile##' configure.ac
-                - ./autogen.sh --prefix=/app
-                - make
-                - make install
-            cleanup:
-                - "/include"
-                - "*.a"
-            sources:
-                - type: git
-                  url: https://github.com/mirrorer/giflib.git
-                  commit: fa37672085ce4b3d62c51627ab3c8cf2dda8009a
+          - perl -pi -e 's#doc/Makefile##' configure.ac
+          - ./autogen.sh --prefix=/app
+          - make
+          - make install
+        cleanup:
+          - /include
+          - '*.a'
+        sources:
+          - type: git
+            url: https://github.com/mirrorer/giflib.git
+            commit: fa37672085ce4b3d62c51627ab3c8cf2dda8009a
                   # Note that libgdiplus needs giflib to have GifQuantizeBuffer.
                   # Some giflibs need adjustment to have that built in.
-          - name: libgdiplus
-            build-options:
-                env:
-                    MONO_PREFIX: /app
-            config-opts:
-                - --with-pango
-            cleanup:
-                - "/include"
-                - "*.a"
-            sources:
-                - type: git
-                  url: https://github.com/sillsdev/libgdiplus
-                  tag: merge/5.6.0
-                  commit: b9c581ba87da89651d5ec56c5da0960ab739a63a
-          - name: ping
+      - name: libgdiplus
+        build-options:
+          env:
+            MONO_PREFIX: /app
+        config-opts:
+          - --with-pango
+        cleanup:
+          - /include
+          - '*.a'
+        sources:
+          - type: git
+            url: https://github.com/sillsdev/libgdiplus
+            tag: merge/5.6.0
+            commit: b9c581ba87da89651d5ec56c5da0960ab739a63a
+      - name: ping
             # Bloom uses .NET/Mono Ping to check connectivity. Mono's Ping
             # uses the ping utility.
-            buildsystem: meson
-            config-opts:
-              - -DBUILD_ARPING=false
-              - -DBUILD_CLOCKDIFF=false
-              - -DBUILD_RARPD=false
-              - -DBUILD_RDISC=false
-              - -DENABLE_RDISC_SERVER=false
-              - -DBUILD_TRACEPATH=false
-              - -DBUILD_NINFOD=false
-              - -DBUILD_MANS=false
-              - -DSKIP_TESTS=true
-            sources:
-              - type: git
-                url: https://github.com/iputils/iputils.git
-                tag: "20211215"
-                commit: "1d1e7c43210d8af316a41cb2c53d612a4c16f34d"
+        buildsystem: meson
+        config-opts:
+          - -DBUILD_ARPING=false
+          - -DBUILD_CLOCKDIFF=false
+          - -DBUILD_RARPD=false
+          - -DBUILD_RDISC=false
+          - -DENABLE_RDISC_SERVER=false
+          - -DBUILD_TRACEPATH=false
+          - -DBUILD_NINFOD=false
+          - -DBUILD_MANS=false
+          - -DSKIP_TESTS=true
+        sources:
+          - type: git
+            url: https://github.com/iputils/iputils.git
+            tag: '20211215'
+            commit: 1d1e7c43210d8af316a41cb2c53d612a4c16f34d
           # chmlib is needed for xchm
-          - name: chmlib
-            cleanup:
-                - "/include"
-                - "*.a"
-            sources:
-                - type: git
-                  url: https://github.com/jedwing/CHMLib
+      - name: chmlib
+        cleanup:
+          - /include
+          - '*.a'
+        sources:
+          - type: git
+            url: https://github.com/jedwing/CHMLib
                   # Latest commit, from 2009-07-03.
-                  commit: 2bef8d063ec7d88a8de6fd9f0513ea42ac0fa21f
-                - type: shell
-                  commands:
-                      - autoreconf --install
+            commit: 2bef8d063ec7d88a8de6fd9f0513ea42ac0fa21f
+          - type: shell
+            commands:
+              - autoreconf --install
           # wxWidgets is needed for xchm
-          - name: wxWidgets
-            cleanup:
-                - "/include"
-                - "/lib/wx/include"
-                - "*.a"
-            sources:
-                - type: git
-                  url: https://github.com/wxWidgets/wxWidgets
+      - name: wxWidgets
+        cleanup:
+          - /include
+          - /lib/wx/include
+          - '*.a'
+        sources:
+          - type: git
+            url: https://github.com/wxWidgets/wxWidgets
                   # v3.0.4 is used in Ubuntu 20.04.
                   # v3.1.1+ is needed for xchm to write to XDG_CONFIG_HOME.
                   # However, v3.1.0 appears to introduce a problem rendering the
                   # chm html. v3.0.5.1 still worked, rendering the html.
-                  tag: v3.0.4
-                  commit: 721d62adde3f8ba8704a9cf56efeb050f652dfbf
-          - name: xchm
+            tag: v3.0.4
+            commit: 721d62adde3f8ba8704a9cf56efeb050f652dfbf
+      - name: xchm
             # Help file viewer
-            cleanup:
-                - "/include"
-                - "*.a"
-                - "/share/icons"
-                - "/share/applications"
-            sources:
-                - type: git
-                  url: https://github.com/rzvncj/xCHM
+        cleanup:
+          - /include
+          - '*.a'
+          - /share/icons
+          - /share/applications
+        sources:
+          - type: git
+            url: https://github.com/rzvncj/xCHM
                   # Version 1.31 is used in Ubuntu 20.04.
-                  tag: "1.31"
-                  commit: e983d11fd546c961501f736b2c6f93178c92fa97
-                - type: patch
+            tag: '1.31'
+            commit: e983d11fd546c961501f736b2c6f93178c92fa97
+          - type: patch
                   # xchm would otherwise need to write to files ~/.xchmXXXXXX and
                   # ~/.xchm. This won't be needed after upgrading to a newer xchm
                   # version and wxWidgets v3.1.1+.
-                  path: patches/xchm/no-config.patch
-          - name: wget
-            buildsystem: autotools
-            cleanup:
+            path: patches/xchm/no-config.patch
+      - name: wget
+        buildsystem: autotools
+        cleanup:
                 # Don't ship.
-                - "*"
-            sources:
-                - type: archive
-                  url: https://ftp.gnu.org/gnu/wget/wget-1.20.3.tar.gz
-                  sha512: e8b82b40e270296228094a78d47f81580bdbdea9e6b93fd61b37dccb39430aeb9bda5397dc53a31c952a61629383c7e2a8c8abf414c8a4dd369af6ecf2717e6c
+          - '*'
+        sources:
+          - type: archive
+            url: https://ftp.gnu.org/gnu/wget/wget-1.20.3.tar.gz
+            sha512: e8b82b40e270296228094a78d47f81580bdbdea9e6b93fd61b37dccb39430aeb9bda5397dc53a31c952a61629383c7e2a8c8abf414c8a4dd369af6ecf2717e6c
             # For Gecko.
-          - shared-modules/dbus-glib/dbus-glib.json
-          - name: fonts-sil-andika-new-basic
+      - shared-modules/dbus-glib/dbus-glib.json
+      - name: fonts-sil-andika-new-basic
             # From https://software.sil.org/andika/download/
-            buildsystem: simple
-            build-commands:
-                - mkdir -p /app/share/fonts/truetype/andika-new-basic
-                - cp --verbose --force -a *.ttf /app/share/fonts/truetype/andika-new-basic
-            sources:
-                - type: archive
-                  url: https://software.sil.org/downloads/r/andika/AndikaNewBasic-5.500.zip
-                  sha512: 53513c782889fd7e87903cab43f1e419a87cfbc425fd722b621cbdb1b1928584b5ce82ecc56e6f6aa1073ed30268993c46c451dfd8b198b430a54a5cf1eb10a1
+        buildsystem: simple
+        build-commands:
+          - mkdir -p /app/share/fonts/truetype/andika-new-basic
+          - cp --verbose --force -a *.ttf /app/share/fonts/truetype/andika-new-basic
+        sources:
+          - type: archive
+            url: https://software.sil.org/downloads/r/andika/AndikaNewBasic-5.500.zip
+            sha512: 53513c782889fd7e87903cab43f1e419a87cfbc425fd722b621cbdb1b1928584b5ce82ecc56e6f6aa1073ed30268993c46c451dfd8b198b430a54a5cf1eb10a1
           # libxmu is needed for wmctrl
-          - name: libxmu
-            buildsystem: autotools
-            cleanup:
-                - "/include"
-                - "*.a"
-            sources:
-                - type: git
-                  url: https://gitlab.freedesktop.org/xorg/lib/libxmu.git
-                  commit: e9efe2d027b4c46cf6834cc532222f8ad1d1d3c3
-          - name: wmctrl
-            buildsystem: autotools
-            sources:
-                - type: git
-                  url: https://github.com/Conservatory/wmctrl.git
-                  commit: 7c1dcbaa221a16e8a9765bf2b14d61d640a52304
-          - name: libtidy-sil
-            buildsystem: cmake
-            config-opts:
-                - -DBUILD_SHARED_LIB:BOOL=TRUE
-            cleanup:
-                - "*.a"
-            sources:
-                - type: git
-                  url: https://github.com/BloomBooks/tidy-html5.git
-                  commit: 8efa8feb2046d31f9216e1ef806609c311809dea
-          - name: lcdf-typetools
+      - name: libxmu
+        buildsystem: autotools
+        cleanup:
+          - /include
+          - '*.a'
+        sources:
+          - type: git
+            url: https://gitlab.freedesktop.org/xorg/lib/libxmu.git
+            commit: e9efe2d027b4c46cf6834cc532222f8ad1d1d3c3
+      - name: wmctrl
+        buildsystem: autotools
+        sources:
+          - type: git
+            url: https://github.com/Conservatory/wmctrl.git
+            commit: 7c1dcbaa221a16e8a9765bf2b14d61d640a52304
+      - name: libtidy-sil
+        buildsystem: cmake
+        config-opts:
+          - -DBUILD_SHARED_LIB:BOOL=TRUE
+        cleanup:
+          - '*.a'
+        sources:
+          - type: git
+            url: https://github.com/BloomBooks/tidy-html5.git
+            commit: 8efa8feb2046d31f9216e1ef806609c311809dea
+      - name: lcdf-typetools
             # otfinfo (one of the lcdf-typetools)
-            buildsystem: autotools
-            config-opts:
-                - --without-kpathsea
-                - --disable-adobe-code
-                - --disable-cfftot1
-                - --disable-mmafm
-                - --disable-mmpfb
-                - --disable-otftotfm
-                - --disable-t1dotlessj
-                - --disable-t1lint
-                - --disable-t1rawafm
-                - --disable-t1reencode
-                - --disable-t1testpage
-                - --disable-ttftotype42
-            cleanup:
-                - "*.a"
-            sources:
-                - type: git
-                  url: https://salsa.debian.org/fonts-team/lcdf-typetools.git
-                  commit: 635cbab327dbff73a7b1acd4b322c850f202b7bd
-          - name: ghostscript
-            config-opts:
-                - --disable-cups
-                - --disable-dbus
-                - --enable-dynamic
-                - --disable-hidden-visibility
-                - --disable-gtk
-                - --with-drivers=FILES
-            make-args:
-                - so
-            make-install-args:
-                - install
-                - soinstall
-            sources:
-                - type: archive
-                  url: https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10011/ghostscript-10.01.1.tar.gz
-                  sha256: 4df18a808cd4369f25e02dbcec2f133cb6d674627b2c6b1502020e58d43e32ce
-            cleanup:
-                - /share/doc
-                - /share/ghostscript/*/doc
-                - /share/ghostscript/*/examples
-                - /share/man
+        buildsystem: autotools
+        config-opts:
+          - --without-kpathsea
+          - --disable-adobe-code
+          - --disable-cfftot1
+          - --disable-mmafm
+          - --disable-mmpfb
+          - --disable-otftotfm
+          - --disable-t1dotlessj
+          - --disable-t1lint
+          - --disable-t1rawafm
+          - --disable-t1reencode
+          - --disable-t1testpage
+          - --disable-ttftotype42
+        cleanup:
+          - '*.a'
+        sources:
+          - type: git
+            url: https://salsa.debian.org/fonts-team/lcdf-typetools.git
+            commit: 635cbab327dbff73a7b1acd4b322c850f202b7bd
+      - name: ghostscript
+        config-opts:
+          - --disable-cups
+          - --disable-dbus
+          - --enable-dynamic
+          - --disable-hidden-visibility
+          - --disable-gtk
+          - --with-drivers=FILES
+        make-args:
+          - so
+        make-install-args:
+          - install
+          - soinstall
+        sources:
+          - type: archive
+            url: https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10011/ghostscript-10.01.1.tar.gz
+            sha256: 4df18a808cd4369f25e02dbcec2f133cb6d674627b2c6b1502020e58d43e32ce
+        cleanup:
+          - /share/doc
+          - /share/ghostscript/*/doc
+          - /share/ghostscript/*/examples
+          - /share/man
           # graphicsmagick
-          - name: GraphicsMagick
-            sources:
-                - type: archive
-                  url: https://sourceforge.net/projects/graphicsmagick/files/graphicsmagick/1.3.35/GraphicsMagick-1.3.35.tar.bz2
-                  sha256: 7fd0b49903eb35df4ab5ca76139ab3f023f47485a4913fbdcf5c642c6e5f01fc
-          - python3-aeneas.yml
+      - name: GraphicsMagick
+        sources:
+          - type: archive
+            url: https://sourceforge.net/projects/graphicsmagick/files/graphicsmagick/1.3.35/GraphicsMagick-1.3.35.tar.bz2
+            sha256: 7fd0b49903eb35df4ab5ca76139ab3f023f47485a4913fbdcf5c642c6e5f01fc
+      - python3-aeneas.yml
           # msbuild is needed for building geckofx.  It's the msbuild tied to the mono6 sdk.  (I don't know why it isn't part of that sdk!)
           # We already have another msbuild (mono5-sil-msbuild) tied to mono5-sil which is installed in /app for building BloomDesktop.
-          - name: msbuild
-            sources:
-                - type: file
-                  url: https://download.mono-project.com/repo/ubuntu/pool/main/m/msbuild/msbuild_16.10.1+xamarinxplat.2021.05.26.14.00-0xamarin2+ubuntu2004b1_all.deb
-                  sha256: 32f1eba1c2df67bc55920cd45ce3689c32a5c705ae01fd7ead52ca180221b469
-            buildsystem: simple
-            build-commands:
-                - ar x msbuild_*.deb
-                - tar xf data.tar.xz
-                - sed -e 's|/usr/|/usr/lib/sdk/mono6/|g' -i usr/bin/msbuild
-                - cp -a usr/. /usr/lib/sdk/mono6/
-          - name: ca-certificates
-            sources:
-                - type: file
-                  url: http://us.archive.ubuntu.com/ubuntu/pool/main/c/ca-certificates/ca-certificates_20230311ubuntu1_all.deb
-                  sha256: afb91d57ac5a34a2f65faa890f28f9596127d1b4131d64aab13acbadb1d5e023
-            buildsystem: simple
-            build-commands:
-                - |
-                    set -xueo pipefail
-                    ar x ca-certificates_*all.deb
-                    tar xf data.tar.zst
-                    cat usr/share/ca-certificates/mozilla/*.crt >ca-certificates.crt
-                    install -d /app/share/ca-certificates
-                    install ca-certificates.crt /app/share/ca-certificates
-          - name: geckofx
-            buildsystem: simple
-            build-commands:
-                - |
-                    set -xueo pipefail
-                    pwd
-                    ls -FC
-                    msbuild /p:Configuration=Release_Linux /p:Platform="Any CPU" Geckofx.sln
-                    # copy where these can be found by the BloomDesktop nuget package code
-                    install -d /app/geckofx
-                    install Geckofx-Winforms/bin/Release_Linux/Geckofx-Core.dll /app/geckofx
-                    install Geckofx-Winforms/bin/Release_Linux/Geckofx-Core.dll.config /app/geckofx
-                    install Geckofx-Winforms/bin/Release_Linux/Geckofx-Core.pdb /app/geckofx
-                    install Geckofx-Winforms/bin/Release_Linux/Geckofx-Winforms.dll /app/geckofx
-                    install Geckofx-Winforms/bin/Release_Linux/Geckofx-Winforms.dll.config /app/geckofx
-                    install Geckofx-Winforms/bin/Release_Linux/Geckofx-Winforms.pdb /app/geckofx
-            sources:
-                - type: git
-                  url: https://github.com/StephenMcConnel/Geckofx60.git
-                  commit: a77e5ba72728630ee02b95892d5fd0c219f87c98
-                - type: patch
-                  path: patches/geckofx/FixesForFlatpak.patch
+      - name: msbuild
+        sources:
+          - type: file
+            url: https://download.mono-project.com/repo/ubuntu/pool/main/m/msbuild/msbuild_16.10.1+xamarinxplat.2021.05.26.14.00-0xamarin2+ubuntu2004b1_all.deb
+            sha256: 32f1eba1c2df67bc55920cd45ce3689c32a5c705ae01fd7ead52ca180221b469
+        buildsystem: simple
+        build-commands:
+          - ar x msbuild_*.deb
+          - tar xf data.tar.xz
+          - sed -e 's|/usr/|/usr/lib/sdk/mono6/|g' -i usr/bin/msbuild
+          - cp -a usr/. /usr/lib/sdk/mono6/
+      - name: ca-certificates
+        sources:
+          - type: file
+            url: http://us.archive.ubuntu.com/ubuntu/pool/main/c/ca-certificates/ca-certificates_20230311ubuntu1_all.deb
+            sha256: afb91d57ac5a34a2f65faa890f28f9596127d1b4131d64aab13acbadb1d5e023
+        buildsystem: simple
+        build-commands:
+          - |
+            set -xueo pipefail
+            ar x ca-certificates_*all.deb
+            tar xf data.tar.zst
+            cat usr/share/ca-certificates/mozilla/*.crt >ca-certificates.crt
+            install -d /app/share/ca-certificates
+            install ca-certificates.crt /app/share/ca-certificates
+      - name: geckofx
+        buildsystem: simple
+        build-commands:
+          - |
+            set -xueo pipefail
+            pwd
+            ls -FC
+            msbuild /p:Configuration=Release_Linux /p:Platform="Any CPU" Geckofx.sln
+            # copy where these can be found by the BloomDesktop nuget package code
+            install -d /app/geckofx
+            install Geckofx-Winforms/bin/Release_Linux/Geckofx-Core.dll /app/geckofx
+            install Geckofx-Winforms/bin/Release_Linux/Geckofx-Core.dll.config /app/geckofx
+            install Geckofx-Winforms/bin/Release_Linux/Geckofx-Core.pdb /app/geckofx
+            install Geckofx-Winforms/bin/Release_Linux/Geckofx-Winforms.dll /app/geckofx
+            install Geckofx-Winforms/bin/Release_Linux/Geckofx-Winforms.dll.config /app/geckofx
+            install Geckofx-Winforms/bin/Release_Linux/Geckofx-Winforms.pdb /app/geckofx
+        sources:
+          - type: git
+            url: https://github.com/StephenMcConnel/Geckofx60.git
+            commit: a77e5ba72728630ee02b95892d5fd0c219f87c98
+          - type: patch
+            path: patches/geckofx/FixesForFlatpak.patch
           # Andika Fonts
           # Extract fonts. The 'type: archive', 'archive-type: zip' has some trouble working,
           # so manually extract.
-          - name: AndikaFonts
-            sources:
-                - type: file
-                  url: https://software.sil.org/downloads/r/andika/Andika-6.101.zip
-                  sha256: 8595a879054a540b24fa942a2621efcd194a9f6468d9cf2541ae693e496b8dd4
-                - type: file
-                  url: https://software.sil.org/downloads/r/andika/AndikaNewBasic-5.500.zip
-                  sha256: 18308284a3e98cd7712d057742d8d6cd040a52ec0479a1dcf92d57815f8d368a
-            buildsystem: simple
-            build-commands:
-                - |
-                    set -xueo pipefail
-                    unzip -uqo Andika-6.101.zip
-                    install -d /app/share/fonts/truetype/andika
-                    install Andika-6.101/Andika-Regular.ttf /app/share/fonts/truetype/andika
-                    install Andika-6.101/Andika-Bold.ttf /app/share/fonts/truetype/andika
-                    install Andika-6.101/Andika-Italic.ttf /app/share/fonts/truetype/andika
-                    install Andika-6.101/Andika-BoldItalic.ttf /app/share/fonts/truetype/andika
-                    install -d /app/share/doc/fonts-sil-andika
-                    install Andika-6.101/OFL.txt /app/share/doc/fonts-sil-andika
-                    install Andika-6.101/README.txt /app/share/doc/fonts-sil-andika
-                    unzip -uqo AndikaNewBasic-5.500.zip
-                    install -d /app/share/fonts/opentype/andika-new-basic
-                    install AndikaNewBasic-5.500/AndikaNewBasic-R.ttf /app/share/fonts/opentype/andika-new-basic
-                    install AndikaNewBasic-5.500/AndikaNewBasic-B.ttf /app/share/fonts/opentype/andika-new-basic
-                    install AndikaNewBasic-5.500/AndikaNewBasic-I.ttf /app/share/fonts/opentype/andika-new-basic
-                    install AndikaNewBasic-5.500/AndikaNewBasic-BI.ttf /app/share/fonts/opentype/andika-new-basic
-                    install -d /app/share/doc/fonts-sil-andika-new-basic
-                    install AndikaNewBasic-5.500/OFL.txt /app/share/doc/fonts-sil-andika-new-basic
-                    install AndikaNewBasic-5.500/README.txt /app/share/doc/fonts-sil-andika-new-basic
+      - name: AndikaFonts
+        sources:
+          - type: file
+            url: https://software.sil.org/downloads/r/andika/Andika-6.101.zip
+            sha256: 8595a879054a540b24fa942a2621efcd194a9f6468d9cf2541ae693e496b8dd4
+          - type: file
+            url: https://software.sil.org/downloads/r/andika/AndikaNewBasic-5.500.zip
+            sha256: 18308284a3e98cd7712d057742d8d6cd040a52ec0479a1dcf92d57815f8d368a
+        buildsystem: simple
+        build-commands:
+          - |
+            set -xueo pipefail
+            unzip -uqo Andika-6.101.zip
+            install -d /app/share/fonts/truetype/andika
+            install Andika-6.101/Andika-Regular.ttf /app/share/fonts/truetype/andika
+            install Andika-6.101/Andika-Bold.ttf /app/share/fonts/truetype/andika
+            install Andika-6.101/Andika-Italic.ttf /app/share/fonts/truetype/andika
+            install Andika-6.101/Andika-BoldItalic.ttf /app/share/fonts/truetype/andika
+            install -d /app/share/doc/fonts-sil-andika
+            install Andika-6.101/OFL.txt /app/share/doc/fonts-sil-andika
+            install Andika-6.101/README.txt /app/share/doc/fonts-sil-andika
+            unzip -uqo AndikaNewBasic-5.500.zip
+            install -d /app/share/fonts/opentype/andika-new-basic
+            install AndikaNewBasic-5.500/AndikaNewBasic-R.ttf /app/share/fonts/opentype/andika-new-basic
+            install AndikaNewBasic-5.500/AndikaNewBasic-B.ttf /app/share/fonts/opentype/andika-new-basic
+            install AndikaNewBasic-5.500/AndikaNewBasic-I.ttf /app/share/fonts/opentype/andika-new-basic
+            install AndikaNewBasic-5.500/AndikaNewBasic-BI.ttf /app/share/fonts/opentype/andika-new-basic
+            install -d /app/share/doc/fonts-sil-andika-new-basic
+            install AndikaNewBasic-5.500/OFL.txt /app/share/doc/fonts-sil-andika-new-basic
+            install AndikaNewBasic-5.500/README.txt /app/share/doc/fonts-sil-andika-new-basic
           # for gtklp
-          - shared-modules/gtk2/gtk2.json
-          - name: gtklp
-            sources:
-              - type: archive
-                url: https://downloads.sourceforge.net/project/gtklp/gtklp/1.3.4/gtklp-1.3.4.src.tar.gz
-                sha256: be07609042595fa932034e3b2d7038cef33901ec0863fcedbb5188acb6b53bab
-              - type: patch
-                path: patches/gtklp/FixGtklpForNewGcc.patch
+      - shared-modules/gtk2/gtk2.json
+      - name: gtklp
+        sources:
+          - type: archive
+            url: https://downloads.sourceforge.net/project/gtklp/gtklp/1.3.4/gtklp-1.3.4.src.tar.gz
+            sha256: be07609042595fa932034e3b2d7038cef33901ec0863fcedbb5188acb6b53bab
+          - type: patch
+            path: patches/gtklp/FixGtklpForNewGcc.patch
           # for xterm (used by bulk upload)
-          - name: xterm
-            sources:
-              - type: git
-                url: https://github.com/ThomasDickey/xterm-snapshots.git
-                tag: xterm-379
-                commit: 2ba96df676100dcb013e15f7392718e1b793907c
-                x-checker-data:
-                  type: anitya
-                  project-id: 5272
-                  tag-template: xterm-$version
-                  is-main-source: true
-            modules:
-              - name: libXaw
-                sources: &libXaw-sources
-                  - type: archive
-                    url: https://www.x.org/archive/individual/lib/libXaw-1.0.15.tar.xz
-                    sha256: ab35f70fde9fb02cc71b342f654846a74328b74cb3a0703c02d20eddb212754a
-              - name: libXaw-32bit
-                sources: *libXaw-sources
-              - name: ncurses
-                sources:
-                  - type: archive
-                    url: https://invisible-mirror.net/archives/ncurses/ncurses-6.4.tar.gz
-                    sha256: 6931283d9ac87c5073f30b6290c4c75f21632bb4fc3603ac8100812bed248159
-          # for ffmpeg
-          - name: libx264
-            config-opts:
-              - --enable-shared
-              - --disable-cli
-              - --enable-static
-              - --disable-cli
-              - --disable-gpl
-              - --disable-opencl
-              - --disable-avs
-              - --disable-swscale
-              - --disable-lavf
-              - --disable-ffms
-              - --disable-gpac
-              - --disable-lsmash
-              - --enable-lto
-            sources:
-              - type: git
-                url: https://code.videolan.org/videolan/x264.git
-                commit: baee400fa9ced6f5481a728138fed6e867b0ff7f
-          - name: ffmpeg
-            config-opts:
-              - --disable-postproc
-              - --enable-avcodec
-              - --enable-avdevice
-              - --enable-avformat
-              - --enable-avfilter
-              - --enable-swresample
-              - --enable-swscale
-              - --disable-encoders
-              - --enable-encoder=rawvideo,libx264,libvpx_vp8,aac,libmp3lame,h263,pcm_s16be,pcm_s24be,pcm_s16le,pcm_s24le,pcm_s32le,pcm_u8,null
-              - --disable-hwaccels
-              - --disable-parsers
-              - --enable-parser=h264,vp8,mpegaudio
-              - --disable-protocols
-              - --enable-protocol=file,concat
-              - --disable-muxers
-              - --enable-muxer=rawvideo,mp4,mp3,tgp,pcm_s16be,pcm_s16le,wav,null
-              - --disable-bsfs
-              - --disable-filters
-              - --enable-filter=scale,adelay,afade,amix,aresample,volume
-              - --disable-indevs
-              - --enable-indev=gdigrab
-              - --disable-outdevs
-              - --disable-autodetect
-              - --enable-libx264
-              - --enable-libvorbis
-              - --enable-libvpx
-              - --enable-libmp3lame
-              - --disable-programs
-              - --enable-ffmpeg
-              - --disable-doc
-              - --disable-htmlpages
-              - --disable-manpages
-              - --disable-podpages
-              - --disable-txtpages
-              - --enable-gpl
+      - name: xterm
+        sources:
+          - type: git
+            url: https://github.com/ThomasDickey/xterm-snapshots.git
+            tag: xterm-388
+            commit: 4130ad43faa71d94ad1508d57d1c22237b09e012
+            x-checker-data:
+              type: anitya
+              project-id: 5272
+              tag-template: xterm-$version
+              is-main-source: true
+        modules:
+          - name: libXaw
+            sources: &libXaw-sources
+              - type: archive
+                url: https://www.x.org/archive/individual/lib/libXaw-1.0.15.tar.xz
+                sha256: ab35f70fde9fb02cc71b342f654846a74328b74cb3a0703c02d20eddb212754a
+          - name: libXaw-32bit
+            sources: *libXaw-sources
+          - name: ncurses
             sources:
               - type: archive
-                url: https://ffmpeg.org/releases/ffmpeg-5.1.2.tar.xz
-                sha256: 619e706d662c8420859832ddc259cd4d4096a48a2ce1eefd052db9e440eef3dc
-    - name: ArtOfReading
-      sources:
+                url: https://invisible-mirror.net/archives/ncurses/ncurses-6.4.tar.gz
+                sha256: 6931283d9ac87c5073f30b6290c4c75f21632bb4fc3603ac8100812bed248159
+          # for ffmpeg
+      - name: libx264
+        config-opts:
+          - --enable-shared
+          - --disable-cli
+          - --enable-static
+          - --disable-cli
+          - --disable-gpl
+          - --disable-opencl
+          - --disable-avs
+          - --disable-swscale
+          - --disable-lavf
+          - --disable-ffms
+          - --disable-gpac
+          - --disable-lsmash
+          - --enable-lto
+        sources:
+          - type: git
+            url: https://code.videolan.org/videolan/x264.git
+            commit: baee400fa9ced6f5481a728138fed6e867b0ff7f
+      - name: ffmpeg
+        config-opts:
+          - --disable-postproc
+          - --enable-avcodec
+          - --enable-avdevice
+          - --enable-avformat
+          - --enable-avfilter
+          - --enable-swresample
+          - --enable-swscale
+          - --disable-encoders
+          - --enable-encoder=rawvideo,libx264,libvpx_vp8,aac,libmp3lame,h263,pcm_s16be,pcm_s24be,pcm_s16le,pcm_s24le,pcm_s32le,pcm_u8,null
+          - --disable-hwaccels
+          - --disable-parsers
+          - --enable-parser=h264,vp8,mpegaudio
+          - --disable-protocols
+          - --enable-protocol=file,concat
+          - --disable-muxers
+          - --enable-muxer=rawvideo,mp4,mp3,tgp,pcm_s16be,pcm_s16le,wav,null
+          - --disable-bsfs
+          - --disable-filters
+          - --enable-filter=scale,adelay,afade,amix,aresample,volume
+          - --disable-indevs
+          - --enable-indev=gdigrab
+          - --disable-outdevs
+          - --disable-autodetect
+          - --enable-libx264
+          - --enable-libvorbis
+          - --enable-libvpx
+          - --enable-libmp3lame
+          - --disable-programs
+          - --enable-ffmpeg
+          - --disable-doc
+          - --disable-htmlpages
+          - --disable-manpages
+          - --disable-podpages
+          - --disable-txtpages
+          - --enable-gpl
+        sources:
+          - type: archive
+            url: https://ffmpeg.org/releases/ffmpeg-5.1.2.tar.xz
+            sha256: 619e706d662c8420859832ddc259cd4d4096a48a2ce1eefd052db9e440eef3dc
+  - name: ArtOfReading
+    sources:
           # This .deb contains only PNG image files with a few text files such
           # as an index and changelog.
-          - type: file
-            url: https://packages.sil.org/ubuntu/pool/main/a/art-of-reading3/art-of-reading3_3.3.1+bionic1_all.deb
-            sha256: 96d99d60c1838aaac8461e3568185cc287206d2852bd3e11d94eef5d9d6a3f15
-      buildsystem: simple
-      build-commands:
+      - type: file
+        url: https://packages.sil.org/ubuntu/pool/main/a/art-of-reading3/art-of-reading3_3.3.1+bionic1_all.deb
+        sha256: 96d99d60c1838aaac8461e3568185cc287206d2852bd3e11d94eef5d9d6a3f15
+    buildsystem: simple
+    build-commands:
           # Extract art-of-reading3 images into /app instead of /usr
-          - |
-              for package in *.deb; do
-                mkdir "${package}-dir" &&
-                  (cd "${package}-dir" && ar x ../"${package}") &&
-                  tar -C /app -x -f "${package}-dir"/data.tar.xz \
-                    --strip-components=2 ./usr
-              done
+      - |
+        for package in *.deb; do
+          mkdir "${package}-dir" &&
+            (cd "${package}-dir" && ar x ../"${package}") &&
+            tar -C /app -x -f "${package}-dir"/data.tar.xz \
+              --strip-components=2 ./usr
+        done
